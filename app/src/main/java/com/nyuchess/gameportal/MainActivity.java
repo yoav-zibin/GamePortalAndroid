@@ -1,6 +1,7 @@
 package com.nyuchess.gameportal;
 
 import android.content.Intent;
+import android.hardware.camera2.params.Face;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +22,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void doPhoneLogin(View view){
         Intent intent = new Intent(this, PhoneLoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void doFacebookLogin(View view){
+        Intent intent = new Intent(this, FacebookLoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void doTwitterLogin(View view){
+        Intent intent = new Intent(this, TwitterLoginActivity.class);
         startActivity(intent);
     }
 

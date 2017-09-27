@@ -19,7 +19,9 @@
         <activity android:name=".EmailLoginActivity" />
         <activity android:name=".PhoneLoginActivity" />
         <activity android:name=".GooglePlusLoginActivity" />
-        <activity android:name=".AnonymousLoginActivity"></activity>
+        <activity android:name=".AnonymousLoginActivity" />
+        <activity android:name=".FacebookLoginActivity" />
+        <activity android:name=".TwitterLoginActivity"></activity>
     </application>
 
 </manifest>

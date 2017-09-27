@@ -22,10 +22,26 @@
         android:text="Phone Number"
         android:onClick="doPhoneLogin"/>
     <Button
-        android:id="@+id/gplus_sign_in_button"
+        android:id="@+id/facebook_sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/phone_sign_in_button"
+        android:layout_centerHorizontal="true"
+        android:text="Facebook"
+        android:onClick="doFacebookLogin"/>
+    <Button
+        android:id="@+id/twitter_sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/facebook_sign_in_button"
+        android:layout_centerHorizontal="true"
+        android:text="Twitter"
+        android:onClick="doTwitterLogin"/>
+    <Button
+        android:id="@+id/gplus_sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twitter_sign_in_button"
         android:layout_centerHorizontal="true"
         android:text="Google+"
         android:onClick="doGooglePlusLogin"/>
