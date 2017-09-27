@@ -8,13 +8,10 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button mEmailButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mEmailButton = (Button) findViewById(R.id.email_sign_in_button);
     }
 
     public void doEmailLogin(View view){
@@ -22,5 +19,19 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void doPhoneLogin(View view){
+        Intent intent = new Intent(this, PhoneLoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void doGooglePlusLogin(View view){
+        Intent intent = new Intent(this, GooglePlusLoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void doAnonymousLogin(View view){
+        Intent intent = new Intent(this, AnonymousLoginActivity.class);
+        startActivity(intent);
+    }
 
 }
