@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GamePortal</string>
+    <string name="title_activity_anonymous_login">AnonymousLoginActivity</string>
 </resources>

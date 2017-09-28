@@ -7,28 +7,10 @@
     android:orientation="vertical"
     tools:context="com.nyuchess.gameportal.GooglePlusLoginActivity">
 
-    <EditText
-        android:id="@+id/email_text"
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        android:hint="Email address"/>
-
-    <EditText
-        android:id="@+id/password_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:hint="Password"/>
-
-    <Button
-        android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Log in"
-        android:onClick="doLogin"/>
+        android:layout_height="wrap_content" />
 
 
 </LinearLayout>

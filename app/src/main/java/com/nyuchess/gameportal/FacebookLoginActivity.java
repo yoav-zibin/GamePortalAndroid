@@ -13,6 +13,6 @@ public class FacebookLoginActivity extends AppCompatActivity {
     }
 
     public void doLogin(View view){
-        
+
     }
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "144595629077",
+    "firebase_url": "https://universalgamemaker.firebaseio.com",
+    "project_id": "universalgamemaker",
+    "storage_bucket": "universalgamemaker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:144595629077:android:b77f274e172b23da",
+        "android_client_info": {
+          "package_name": "com.nyuchess.gameportal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "144595629077-q5madqf53fe8bmnacb6eucbtnl1tkigk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nyuchess.gameportal",
+            "certificate_hash": "cbf7c94bb4ca792ee43b315d055e1beedf2ba7b7"
+          }
+        },
+        {
+          "client_id": "144595629077-3pu0e02pilor0fv3dh2uhlol9jriao1j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmRQIcz7cPJXu28k9bo43b9nqQCI4naxE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "144595629077-3pu0e02pilor0fv3dh2uhlol9jriao1j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

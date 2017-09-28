@@ -16,11 +16,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AnonymousLoginActivity"
+            android:label="@string/title_activity_anonymous_login"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".EmailLoginActivity" />
-        <activity android:name=".PhoneLoginActivity" />
-        <activity android:name=".GooglePlusLoginActivity" />
-        <activity android:name=".AnonymousLoginActivity" />
         <activity android:name=".FacebookLoginActivity" />
+        <activity android:name=".GooglePlusLoginActivity" />
+        <activity android:name=".PhoneLoginActivity" />
         <activity android:name=".TwitterLoginActivity"></activity>
     </application>
 

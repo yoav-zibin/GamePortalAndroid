@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.hardware.camera2.params.Face;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -16,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doEmailLogin(View view){
+        Log.d("Main", "Doing email login");
         Intent intent = new Intent(this, EmailLoginActivity.class);
         startActivity(intent);
     }
