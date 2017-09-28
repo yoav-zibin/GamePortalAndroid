@@ -1,5 +1,6 @@
 package com.nyuchess.gameportal;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ public class EmailLoginActivity extends AppCompatActivity implements
         mPasswordField = (EditText) findViewById(R.id.password_text);
 
         findViewById(R.id.login_button).setOnClickListener(this);
+        findViewById(R.id.create_account).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -58,7 +60,9 @@ public class EmailLoginActivity extends AppCompatActivity implements
         mAuth.addAuthStateListener(mAuthListener);
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+        if(currentUser != null) {
+            updateUI(currentUser);
+        }
     }
 
     @Override
@@ -77,7 +81,6 @@ public class EmailLoginActivity extends AppCompatActivity implements
     private void doLogin(String email, String password) {
         Log.d(TAG, "signIn:" + email);
 
-        // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -93,15 +96,58 @@ public class EmailLoginActivity extends AppCompatActivity implements
                             Toast.makeText(EmailLoginActivity.this,
                                     "Failed to send verification email.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
                         }
                     }
                 });
-        // [END sign_in_with_email]
     }
 
     private void updateUI(FirebaseUser user) {
+        Log.d(TAG, "Swapping Screen");
+        Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
+        intent.putExtra("USERNAME", user.getEmail() + " " + user.getUid());
+        startActivity(intent);
+    }
 
+    private void createAccount(String email, String password) {
+        Log.d(TAG, "createAccount:" + email);
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(EmailLoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void sendEmailVerification() {
+        final FirebaseUser user = mAuth.getCurrentUser();
+        user.sendEmailVerification()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(EmailLoginActivity.this,
+                                    "Verification email sent to " + user.getEmail(),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.e(TAG, "sendEmailVerification", task.getException());
+                            Toast.makeText(EmailLoginActivity.this,
+                                    "Failed to send verification email.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -110,6 +156,11 @@ public class EmailLoginActivity extends AppCompatActivity implements
         if(i == R.id.login_button) {
             Log.d(TAG, "Hit login");
             doLogin(mEmailField.getText().toString(), mPasswordField.getText().toString());
+        } else if(i == R.id.create_account) {
+            Log.d(TAG, "Hit create");
+            createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString());
+        } else if (i == R.id.verify) {
+            sendEmailVerification();
         }
     }
 }

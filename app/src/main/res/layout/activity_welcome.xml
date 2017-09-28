@@ -13,5 +13,13 @@
         android:text="Welcome"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-         />
+        />
+
+    <Button
+        android:id="@+id/sign_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="SIGN OUT"
+        android:onClick="SignOut"/>
 </RelativeLayout>

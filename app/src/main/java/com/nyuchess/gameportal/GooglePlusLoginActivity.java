@@ -75,7 +75,6 @@ public class GooglePlusLoginActivity extends AppCompatActivity implements
             } else {
                 // Google Sign In failed, update UI appropriately
                 // [START_EXCLUDE]
-                updateUI(null);
                 Log.d(TAG, "Google failed");
                 // [END_EXCLUDE]
             }
@@ -103,7 +102,6 @@ public class GooglePlusLoginActivity extends AppCompatActivity implements
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Toast.makeText(GooglePlusLoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
                         }
 
                     }
@@ -111,7 +109,10 @@ public class GooglePlusLoginActivity extends AppCompatActivity implements
     }
 
     private void updateUI(FirebaseUser user) {
-
+        Log.d(TAG, "Swapping Screen");
+        Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
+        intent.putExtra("USERNAME", user.getEmail() + " " + user.getUid());
+        startActivity(intent);
     }
 
     private void signOut() {

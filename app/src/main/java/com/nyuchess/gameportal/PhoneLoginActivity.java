@@ -1,5 +1,6 @@
 package com.nyuchess.gameportal;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -94,11 +95,6 @@ public class PhoneLoginActivity extends AppCompatActivity implements
                 // Save verification ID and resending token so we can use them later
                 mVerificationId = verificationId;
                 mResendToken = token;
-
-                // [START_EXCLUDE]
-                // Update UI
-                updateUI(null);
-                // [END_EXCLUDE]
             }
         };
     }
@@ -107,7 +103,10 @@ public class PhoneLoginActivity extends AppCompatActivity implements
     public void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+
+        if(currentUser != null) {
+            updateUI(currentUser);
+        }
 
         if (mVerificationInProgress) {
             startPhoneNumberVerification(mPhoneNumber.getText().toString());
@@ -138,14 +137,16 @@ public class PhoneLoginActivity extends AppCompatActivity implements
                                         "Invalid Code.",
                                         Toast.LENGTH_SHORT).show();
                             }
-                            updateUI(null);
                         }
                     }
                 });
     }
 
     private void updateUI(FirebaseUser user) {
-
+        Log.d(TAG, "Swapping Screen");
+        Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
+        intent.putExtra("USERNAME", user.getEmail() + " " + user.getUid());
+        startActivity(intent);
     }
 
     private void startPhoneNumberVerification(String phoneNumber) {

@@ -29,5 +29,16 @@
         android:layout_height="wrap_content"
         android:text="Log in"/>
 
+    <Button
+        android:id="@+id/create_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Account"/>
+
+    <Button
+        android:id="@+id/verify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Verify Email"/>
 
 </LinearLayout>
