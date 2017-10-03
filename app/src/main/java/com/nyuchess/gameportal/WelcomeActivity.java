@@ -1,10 +1,12 @@
 package com.nyuchess.gameportal;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -14,8 +16,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -24,6 +26,10 @@ public class WelcomeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
+    ListView mUsersListView;
+    ArrayAdapter<String> mAdapter;
+    List<String> mOnlineUsers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +37,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         String username = getIntent().getStringExtra("USERNAME");
 
-        mWelcomeTextView = (TextView) findViewById(R.id.welcome);
+        mWelcomeTextView = findViewById(R.id.welcome);
         mWelcomeTextView.setText("Welcome, " + username);
 
         mAuth = FirebaseAuth.getInstance();
@@ -55,6 +61,14 @@ public class WelcomeActivity extends AppCompatActivity {
         Log.d(TAG, data[0]);
         Log.d(TAG, data[1]);
         Log.d(TAG, "END OF PATHS");
+
+        mUsersListView = findViewById(R.id.online_users_list);
+        mOnlineUsers = getOnlineUsers();
+        mAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,
+                mOnlineUsers);
+        mUsersListView .setAdapter(mAdapter);
+
     }
 
     @Override
@@ -64,10 +78,19 @@ public class WelcomeActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
     }
 
-    public void SignOut(View v) {
+    public void signOut(View v) {
         mAuth.signOut();
 
         Intent intent = new Intent(getBaseContext(), MainActivity.class);
         startActivity(intent);
+    }
+
+    private List<String> getOnlineUsers(){
+        //TODO: implement this
+        List<String> users = new ArrayList<>();
+        users.add("test1");
+        users.add("test2");
+        users.add("test3");
+        return users;
     }
 }
