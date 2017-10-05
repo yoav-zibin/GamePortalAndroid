@@ -44,6 +44,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         findViewById(R.id.chat_button).setOnClickListener(this);
         findViewById(R.id.people_button).setOnClickListener(this);
+        findViewById(R.id.sign_out).setOnClickListener(this);
 
         mWelcomeTextView.setText("Welcome, " + username);
 
@@ -57,11 +58,11 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         DatabaseReference privRef = database.getReference("/users/" + UID + "/private_fields");
 
         pubRef.child("avatarImageUrl").setValue("");
-        pubRef.child("displayName").setValue(username);
+        pubRef.child("displayName").setValue(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
         pubRef.child("isConnected").setValue("True");
-        pubRef.child("LastSeen").setValue("");
+        pubRef.child("lastSeen").setValue("");
 
-        privRef.child("Email").setValue(data[0]);
+        privRef.child("email").setValue(FirebaseAuth.getInstance().getCurrentUser().getEmail());
 
         initialiseOnlinePresence();
     }
@@ -75,6 +76,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         } else if(i == R.id.people_button) {
             Intent intent = new Intent(this, UsersActivity.class);
             startActivity(intent);
+        } else if(i == R.id.sign_out) {
+            signOut();
         }
     }
 
@@ -90,7 +93,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         super.onStart();
     }
 
-    public void signOut(View v) {
+    public void signOut() {
         mAuth.signOut();
 
         String[] data = username.split(" ");
@@ -98,7 +101,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         DatabaseReference pubRef = database.getReference("/users/" + data[1] + "/public_fields");
 
         pubRef.child("isConnected").setValue("False");
-        pubRef.child("LastSeen").setValue(ServerValue.TIMESTAMP);
+        pubRef.child("lastSeen").setValue(ServerValue.TIMESTAMP);
 
         Intent intent = new Intent(getBaseContext(), MainActivity.class);
         startActivity(intent);
@@ -121,11 +124,15 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         final DatabaseReference onlineRef = databaseReference.child(".info/connected");
         final DatabaseReference currentUserRef = databaseReference.child("/presence/" + UID);
+        final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/public_fields/isConnected");
+        final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/public_fields/lastSeen");
         onlineRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 Log.d(TAG, "DataSnapshot:" + dataSnapshot);
                 if (dataSnapshot.getValue(Boolean.class)) {
+                    lastSeenRef.onDisconnect().setValue(ServerValue.TIMESTAMP);
+                    statusRef.onDisconnect().setValue("False");
                     currentUserRef.onDisconnect().removeValue();
                     currentUserRef.setValue(true);
                 }
