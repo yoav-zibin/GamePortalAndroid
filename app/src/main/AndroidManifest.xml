@@ -25,7 +25,9 @@
         <activity android:name=".GooglePlusLoginActivity" />
         <activity android:name=".PhoneLoginActivity" />
         <activity android:name=".TwitterLoginActivity" />
-        <activity android:name=".WelcomeActivity"></activity>
+        <activity android:name=".WelcomeActivity" />
+        <activity android:name=".ChatActivity" />
+        <activity android:name=".PeopleActivity"></activity>
     </application>
 
 </manifest>

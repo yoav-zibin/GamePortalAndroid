@@ -21,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
-public class WelcomeActivity extends AppCompatActivity {
+public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG = "WelcomeActivity";
     TextView mWelcomeTextView;
@@ -43,6 +43,9 @@ public class WelcomeActivity extends AppCompatActivity {
         mWelcomeTextView = (TextView) findViewById(R.id.welcome);
         onlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
 
+        findViewById(R.id.chat_button).setOnClickListener(this);
+        findViewById(R.id.people_button).setOnClickListener(this);
+
         mWelcomeTextView.setText("Welcome, " + username);
 
         mAuth = FirebaseAuth.getInstance();
@@ -62,6 +65,18 @@ public class WelcomeActivity extends AppCompatActivity {
         privRef.child("Email").setValue(data[0]);
 
         initialiseOnlinePresence();
+    }
+
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if(i == R.id.chat_button) {
+            Intent intent = new Intent(this, ChatActivity.class);
+            startActivity(intent);
+        } else if(i == R.id.people_button) {
+            Intent intent = new Intent(this, PeopleActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
