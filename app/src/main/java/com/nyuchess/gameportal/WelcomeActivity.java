@@ -13,7 +13,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,7 +73,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             Intent intent = new Intent(this, ChatActivity.class);
             startActivity(intent);
         } else if(i == R.id.people_button) {
-            Intent intent = new Intent(this, PeopleActivity.class);
+            Intent intent = new Intent(this, UsersActivity.class);
             startActivity(intent);
         }
     }

@@ -57,7 +57,7 @@
         android:layout_alignTop="@+id/chat_button"
         android:layout_toEndOf="@+id/sign_out"
         android:layout_toRightOf="@+id/sign_out"
-        android:text="People" />
+        android:text="Users" />
 
 
 </RelativeLayout>
