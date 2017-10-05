@@ -24,15 +24,16 @@
         android:layout_below="@id/welcome"/>
 
     <!--<Button-->
-        <!--android:id="@+id/view_online_users"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/sign_out"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:text="View Online Users"-->
-        <!--android:onClick="viewOnlineUsers"/>-->
+    <!--android:id="@+id/view_online_users"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/sign_out"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:text="View Online Users"-->
+    <!--android:onClick="viewOnlineUsers"/>-->
 
     <TextView
+        android:id ="@+id/users_online"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Users online:"
