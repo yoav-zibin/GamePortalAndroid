@@ -20,6 +20,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG = "WelcomeActivity";
@@ -30,7 +33,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private GoogleApiClient mGoogleApiClient;
 
     private String UID;
-    private TextView onlineViewerCountTextView;
+    private int mOnlineViewerCount;
+    private TextView mOnlineViewerCountTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +44,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         username = getIntent().getStringExtra("USERNAME");
 
         mWelcomeTextView = (TextView) findViewById(R.id.welcome);
-        onlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
+        mOnlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
 
         findViewById(R.id.chat_button).setOnClickListener(this);
         findViewById(R.id.people_button).setOnClickListener(this);
@@ -54,8 +58,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         UID = data[1];
 
-        DatabaseReference pubRef = database.getReference("/users/" + UID + "/public_fields");
-        DatabaseReference privRef = database.getReference("/users/" + UID + "/private_fields");
+        DatabaseReference pubRef = database.getReference("/users/" + UID + "/publicFields");
+        DatabaseReference privRef = database.getReference("/users/" + UID + "/privateFields");
 
         pubRef.child("avatarImageUrl").setValue("");
         pubRef.child("displayName").setValue(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
@@ -98,7 +102,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         String[] data = username.split(" ");
 
-        DatabaseReference pubRef = database.getReference("/users/" + data[1] + "/public_fields");
+        DatabaseReference pubRef = database.getReference("/users/" + data[1] + "/publicFields");
 
         pubRef.child("isConnected").setValue("False");
         pubRef.child("lastSeen").setValue(ServerValue.TIMESTAMP);
@@ -120,12 +124,20 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initialiseOnlinePresence() {
-        DatabaseReference databaseReference = database.getReference();
+        final DatabaseReference databaseReference = database.getReference();
 
         final DatabaseReference onlineRef = databaseReference.child(".info/connected");
         final DatabaseReference currentUserRef = databaseReference.child("/presence/" + UID);
-        final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/public_fields/isConnected");
-        final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/public_fields/lastSeen");
+        final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/publicFields/isConnected");
+        final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/publicFields/lastSeen");
+
+        // Add self to list of recently connected users
+        final DatabaseReference recentRef = databaseReference.child("/recentlyConnected");
+        Map<String, Object> me = new HashMap<>();
+        me.put("uid", UID);
+        me.put("timestamp", ServerValue.TIMESTAMP);
+        recentRef.push().setValue(me);
+
         onlineRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -143,12 +155,38 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
-        final DatabaseReference onlineViewersCountRef = databaseReference.child("/presence");
+        final DatabaseReference onlineViewersCountRef = databaseReference.child("/recentlyConnected");
         onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 Log.d(TAG, "DataSnapshot:" + dataSnapshot);
-                onlineViewerCountTextView.setText("Users Online: " + String.valueOf(dataSnapshot.getChildrenCount()));
+                for (DataSnapshot user: dataSnapshot.getChildren()){
+                    final String userid = (String) user.child("uid").getValue();
+                    DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields/isConnected");
+                    isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getValue() == null){
+                                return;
+                            }
+                            Log.d(TAG, userid + " " + dataSnapshot.getValue().toString());
+                            if (dataSnapshot.getValue().toString().equals("True")){
+                            // do this in separate methods since inner classes need it to be final for direct references
+                                incrementUserCount();
+                            }
+                            else {
+                                decrementUserCount();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d(TAG, "DatabaseError:" + databaseError);
+                        }
+                    });
+
+                }
+                mOnlineViewerCountTextView.setText("Users Online: " + mOnlineViewerCount);
             }
 
             @Override
@@ -156,5 +194,15 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
+    }
+
+    private void incrementUserCount(){
+        mOnlineViewerCount++;
+        Log.d(TAG, "User online, " + mOnlineViewerCount);
+    }
+
+    private void decrementUserCount(){
+        mOnlineViewerCount--;
+        Log.d(TAG, "User offline, " + mOnlineViewerCount);
     }
 }
