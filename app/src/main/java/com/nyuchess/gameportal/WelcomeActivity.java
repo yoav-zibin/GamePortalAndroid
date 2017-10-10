@@ -33,7 +33,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private GoogleApiClient mGoogleApiClient;
 
     private String UID;
-    private TextView onlineViewerCountTextView;
+    private int mOnlineViewerCount;
+    private TextView mOnlineViewerCountTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         username = getIntent().getStringExtra("USERNAME");
 
         mWelcomeTextView = (TextView) findViewById(R.id.welcome);
-        onlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
+        mOnlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
 
         findViewById(R.id.chat_button).setOnClickListener(this);
         findViewById(R.id.people_button).setOnClickListener(this);
@@ -123,7 +124,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initialiseOnlinePresence() {
-        DatabaseReference databaseReference = database.getReference();
+        final DatabaseReference databaseReference = database.getReference();
 
         final DatabaseReference onlineRef = databaseReference.child(".info/connected");
         final DatabaseReference currentUserRef = databaseReference.child("/presence/" + UID);
@@ -154,12 +155,36 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
-        final DatabaseReference onlineViewersCountRef = databaseReference.child("/presence");
+        final DatabaseReference onlineViewersCountRef = databaseReference.child("/recentlyConnected");
         onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 Log.d(TAG, "DataSnapshot:" + dataSnapshot);
-                onlineViewerCountTextView.setText("Users Online: " + String.valueOf(dataSnapshot.getChildrenCount()));
+                final Integer numOnline = 0;
+                for (DataSnapshot user: dataSnapshot.getChildren()){
+                    String userid = (String) user.child("uid").getValue();
+                    DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/public_fields/isConnected");
+                    isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.d(TAG, dataSnapshot.getValue().toString());
+                            if (dataSnapshot.getValue().toString().equals("True")){
+                            // do this in separate methods since inner classes need it to be final for direct references
+                                incrementUserCount();
+                            }
+                            else {
+                                decrementUserCount();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d(TAG, "DatabaseError:" + databaseError);
+                        }
+                    });
+
+                }
+                mOnlineViewerCountTextView.setText("Users Online: " + mOnlineViewerCount);
             }
 
             @Override
@@ -167,5 +192,15 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
+    }
+
+    private void incrementUserCount(){
+        mOnlineViewerCount++;
+        Log.d(TAG, "User online, " + mOnlineViewerCount);
+    }
+
+    private void decrementUserCount(){
+        mOnlineViewerCount--;
+        Log.d(TAG, "User offline, " + mOnlineViewerCount);
     }
 }
