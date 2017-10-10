@@ -58,8 +58,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         UID = data[1];
 
-        DatabaseReference pubRef = database.getReference("/users/" + UID + "/public_fields");
-        DatabaseReference privRef = database.getReference("/users/" + UID + "/private_fields");
+        DatabaseReference pubRef = database.getReference("/users/" + UID + "/publicFields");
+        DatabaseReference privRef = database.getReference("/users/" + UID + "/privateFields");
 
         pubRef.child("avatarImageUrl").setValue("");
         pubRef.child("displayName").setValue(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
@@ -102,7 +102,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         String[] data = username.split(" ");
 
-        DatabaseReference pubRef = database.getReference("/users/" + data[1] + "/public_fields");
+        DatabaseReference pubRef = database.getReference("/users/" + data[1] + "/publicFields");
 
         pubRef.child("isConnected").setValue("False");
         pubRef.child("lastSeen").setValue(ServerValue.TIMESTAMP);
@@ -128,8 +128,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         final DatabaseReference onlineRef = databaseReference.child(".info/connected");
         final DatabaseReference currentUserRef = databaseReference.child("/presence/" + UID);
-        final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/public_fields/isConnected");
-        final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/public_fields/lastSeen");
+        final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/publicFields/isConnected");
+        final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/publicFields/lastSeen");
 
         // Add self to list of recently connected users
         final DatabaseReference recentRef = databaseReference.child("/recentlyConnected");
@@ -160,14 +160,16 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 Log.d(TAG, "DataSnapshot:" + dataSnapshot);
-                final Integer numOnline = 0;
                 for (DataSnapshot user: dataSnapshot.getChildren()){
-                    String userid = (String) user.child("uid").getValue();
-                    DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/public_fields/isConnected");
+                    final String userid = (String) user.child("uid").getValue();
+                    DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields/isConnected");
                     isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            Log.d(TAG, dataSnapshot.getValue().toString());
+                            if (dataSnapshot.getValue() == null){
+                                return;
+                            }
+                            Log.d(TAG, userid + " " + dataSnapshot.getValue().toString());
                             if (dataSnapshot.getValue().toString().equals("True")){
                             // do this in separate methods since inner classes need it to be final for direct references
                                 incrementUserCount();
