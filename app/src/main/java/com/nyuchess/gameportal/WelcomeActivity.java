@@ -20,6 +20,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG = "WelcomeActivity";
@@ -126,6 +129,14 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         final DatabaseReference currentUserRef = databaseReference.child("/presence/" + UID);
         final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/public_fields/isConnected");
         final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/public_fields/lastSeen");
+
+        // Add self to list of recently connected users
+        final DatabaseReference recentRef = databaseReference.child("/recentlyConnected");
+        Map<String, Object> me = new HashMap<>();
+        me.put("uid", UID);
+        me.put("timestamp", ServerValue.TIMESTAMP);
+        recentRef.push().setValue(me);
+
         onlineRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
