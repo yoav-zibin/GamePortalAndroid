@@ -27,7 +27,8 @@
         <activity android:name=".TwitterLoginActivity" />
         <activity android:name=".WelcomeActivity" />
         <activity android:name=".ChatActivity" />
-        <activity android:name=".UsersActivity"></activity>
+        <activity android:name=".UsersActivity" />
+        <activity android:name=".ChatsListActivity"></activity>
     </application>
 
 </manifest>

@@ -75,6 +75,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         priv.put("email", mAuth.getCurrentUser().getEmail());
         priv.put("createdOn", ServerValue.TIMESTAMP);
 
+
         Map<String, Object> fields = new HashMap<>();
         fields.put("publicFields", pub);
         fields.put("privateFields", priv);
@@ -82,13 +83,26 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         ref.child(mAuth.getCurrentUser().getUid()).setValue(fields);
 
         initialiseOnlinePresence();
+
+        //Add to global chat
+        DatabaseReference chats = database.getReference("/chats");
+
+        Map<String, Object> inChat = new HashMap<>();
+        inChat.put(UID, true);
+
+        Map<String, Object> chat = new HashMap<>();
+        chat.put("participants", inChat);
+        chat.put("groupName", "Global");
+        chat.put("createdOn", ServerValue.TIMESTAMP);
+
+        chats.child("GlobalChat").setValue(chat);
     }
 
     @Override
     public void onClick(View v) {
         int i = v.getId();
         if(i == R.id.chat_button) {
-            Intent intent = new Intent(this, ChatActivity.class);
+            Intent intent = new Intent(this, ChatsListActivity.class);
             startActivity(intent);
         } else if(i == R.id.people_button) {
             Intent intent = new Intent(this, UsersActivity.class);
