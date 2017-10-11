@@ -1,8 +1,12 @@
 package com.nyuchess.gameportal;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -31,7 +35,7 @@ public class UsersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_users);
 
         List<String> onlineUsers = new ArrayList<>();
-        List<String> offlineUsers = new ArrayList<>();
+        final List<String> offlineUsers = new ArrayList<>();
         mOnlineAdapter = new ArrayAdapter<>(this, R.layout.user, onlineUsers);
         mOfflineAdapter = new ArrayAdapter<>(this, R.layout.user, offlineUsers);
 
@@ -52,6 +56,26 @@ public class UsersActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+        ListView online = (ListView)findViewById(R.id.online_users_list);
+        online.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                Intent intent = new Intent();
+                intent.putExtra("PERSONID", mOnlineAdapter.getItem(position));
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+            }
+        });
+
+        ListView offline = (ListView)findViewById(R.id.offne_users_list);
+        offline.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                Intent intent = new Intent();
+                intent.putExtra("PERSONID", mOfflineAdapter.getItem(position));
+                setResult(Activity.RESULT_OK, intent);
+                finish();
             }
         });
     }

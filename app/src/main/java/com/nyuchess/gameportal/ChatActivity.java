@@ -1,5 +1,6 @@
 package com.nyuchess.gameportal;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,18 +13,22 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ChatActivity";
     private FirebaseAuth mAuth;
     private FirebaseListAdapter<ChatMessage> adapter;
     private String chatID;
+
+    public final int ADD_PEOPLE = 1;
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,8 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         displayChatMessages();
+
+        findViewById(R.id.addPpl).setOnClickListener(this);
     }
 
     private void displayChatMessages() {
@@ -85,5 +92,42 @@ public class ChatActivity extends AppCompatActivity {
         };
 
         listOfMessages.setAdapter(adapter);
+    }
+
+    @Override
+    public void onClick(View view) {
+        int i = view.getId();
+        if(i == R.id.addPpl) {
+            Intent intent = new Intent(this, UsersActivity.class);
+            startActivityForResult(intent, ADD_PEOPLE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == 1) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                // The user picked a contact.
+                // The Intent's data Uri identifies which contact was selected.
+                String add = data.getStringExtra("PERSONID");
+
+                DatabaseReference chats = database.getReference("/chats");
+
+                Map<String, Object> inChat = new HashMap<>();
+                inChat.put(add, true);
+
+                chats.child(chatID).child("participants").updateChildren(inChat);
+
+                DatabaseReference pba = database.getReference("/users/" + add);
+                Map<String, Object> chatInfo = new HashMap<>();
+                chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
+                chatInfo.put("timestamp", ServerValue.TIMESTAMP);
+
+                pba.child("privateButAddable").child("chats").child(chatID).setValue(chatInfo);
+                // Do something with the contact here (bigger example below)
+            }
+        }
     }
 }

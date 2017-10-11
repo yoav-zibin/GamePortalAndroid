@@ -13,6 +13,6 @@ public class User {
     public String getDisplayName(){
         return displayName;
     }
-
+    public String getUid() { return uid; }
 
 }

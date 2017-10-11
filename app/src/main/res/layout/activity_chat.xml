@@ -13,25 +13,22 @@
         android:clickable="true"
         android:id="@+id/fab"
         android:tint="@android:color/white"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         app:fabSize="mini"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/addPpl"
+        android:layout_toStartOf="@+id/addPpl" />
 
     <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/fab"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true">
+        android:id="@+id/textInputLayout">
 
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Input"
             android:id="@+id/input"
-            />
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="Input" />
     </android.support.design.widget.TextInputLayout>
 
     <ListView
@@ -45,4 +42,13 @@
         android:id="@+id/list_of_messages"
         android:layout_marginBottom="16dp"
         android:layout_alignParentLeft="true" />
+
+    <Button
+        android:id="@+id/addPpl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add +"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>
