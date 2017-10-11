@@ -143,12 +143,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/publicFields/isConnected");
         final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/publicFields/lastSeen");
 
-        final DatabaseReference recentRef = databaseReference.child("/recentlyConnected");
-        Map<String, Object> me = new HashMap<>();
-        me.put("uid", UID);
-        me.put("timestamp", ServerValue.TIMESTAMP);
-        recentRef.push().setValue(me);
-
         onlineRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -173,6 +167,10 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 people = 0;
                 Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + people);
                 for (DataSnapshot user: dataSnapshot.getChildren()){
+                    if(((int) dataSnapshot.getChildrenCount()) > 20) {
+                        user.getRef().removeValue();
+                        return;
+                    }
                     final String userid = (String) user.child("uid").getValue();
                     DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
                     isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -201,6 +199,13 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
+
+        final DatabaseReference recentRef = databaseReference.child("/recentlyConnected");
+        Map<String, Object> me = new HashMap<>();
+        me.put("uid", UID);
+        me.put("timestamp", ServerValue.TIMESTAMP);
+        recentRef.push().setValue(me);
+
     }
 
     private void addPeople() {
