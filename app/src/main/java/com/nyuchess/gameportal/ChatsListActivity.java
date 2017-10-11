@@ -1,15 +1,17 @@
 package com.nyuchess.gameportal;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -66,12 +68,16 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         });
 
         findViewById(R.id.newChat).setOnClickListener(this);
-    }
 
-    private void updateChatsLists(DataSnapshot dataSnapshot){
-        Log.d(TAG, "updateChatsLists");
-        mChatsAdapter.clear();
-        Log.d(TAG, dataSnapshot.getKey());
+        // Wahhhh cuz Android cries if this is in overriden onclick
+        ListView list = (ListView)findViewById(R.id.chats_list);
+        list.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                Intent intent = new Intent(v.getContext(), ChatActivity.class);
+                intent.putExtra("CHATID", mChatsAdapter.getItem(position));
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

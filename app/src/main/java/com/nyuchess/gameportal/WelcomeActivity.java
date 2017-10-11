@@ -95,7 +95,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         chat.put("groupName", "Global");
         chat.put("createdOn", ServerValue.TIMESTAMP);
 
-        chats.child("GlobalChat").setValue(chat);
+        chats.child("GlobalChat").updateChildren(chat);
     }
 
     @Override

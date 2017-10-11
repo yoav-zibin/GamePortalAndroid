@@ -1,5 +1,7 @@
 package com.nyuchess.gameportal;
 
+import com.google.firebase.database.ServerValue;
+
 import java.util.Date;
 
 /**
@@ -8,43 +10,43 @@ import java.util.Date;
 
 public class ChatMessage {
 
-    private String messageText;
-    private String messageUser;
-    private long messageTime;
+    private String senderUid;
+    private String message;
+    private long timestamp;
 
     public ChatMessage(String messageText, String messageUser) {
-        this.messageText = messageText;
-        this.messageUser = messageUser;
+        this.senderUid = messageText;
+        this.message = messageUser;
 
         // Initialize to current time
-        messageTime = new Date().getTime();
+        timestamp = new Date().getTime();
     }
 
     public ChatMessage(){
 
     }
 
-    public String getMessageText() {
-        return messageText;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMessageText(String messageText) {
-        this.messageText = messageText;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getMessageUser() {
-        return messageUser;
+    public String getSenderUid() {
+        return senderUid;
     }
 
-    public void setMessageUser(String messageUser) {
-        this.messageUser = messageUser;
+    public void setSenderUid(String senderUid) {
+        this.senderUid = senderUid;
     }
 
-    public long getMessageTime() {
-        return messageTime;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setMessageTime(long messageTime) {
-        this.messageTime = messageTime;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }
