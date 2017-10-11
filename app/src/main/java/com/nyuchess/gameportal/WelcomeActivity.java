@@ -80,7 +80,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         fields.put("publicFields", pub);
         fields.put("privateFields", priv);
 
-        ref.child(mAuth.getCurrentUser().getUid()).setValue(fields);
+        ref.child(mAuth.getCurrentUser().getUid()).updateChildren(fields);
 
         initialiseOnlinePresence();
 
