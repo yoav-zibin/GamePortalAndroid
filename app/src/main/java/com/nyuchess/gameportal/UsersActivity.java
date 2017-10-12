@@ -23,8 +23,8 @@ public class UsersActivity extends AppCompatActivity {
 
     public static final String TAG = "UsersActivity";
 
-    private ArrayAdapter<String> mOnlineAdapter;
-    private ArrayAdapter<String> mOfflineAdapter;
+    private UserArrayAdapter mOnlineAdapter;
+    private UserArrayAdapter mOfflineAdapter;
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
@@ -34,10 +34,10 @@ public class UsersActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_users);
 
-        List<String> onlineUsers = new ArrayList<>();
-        final List<String> offlineUsers = new ArrayList<>();
-        mOnlineAdapter = new ArrayAdapter<>(this, R.layout.user, onlineUsers);
-        mOfflineAdapter = new ArrayAdapter<>(this, R.layout.user, offlineUsers);
+        List<User> onlineUsers = new ArrayList<>();
+        final List<User> offlineUsers = new ArrayList<>();
+        mOnlineAdapter = new UserArrayAdapter(this, onlineUsers);
+        mOfflineAdapter = new UserArrayAdapter(this, offlineUsers);
 
         ListView onlineUsersList = findViewById(R.id.online_users_list);
         ListView offlineUsersList = findViewById(R.id.offne_users_list);
@@ -59,21 +59,19 @@ public class UsersActivity extends AppCompatActivity {
             }
         });
 
-        ListView online = (ListView)findViewById(R.id.online_users_list);
-        online.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        onlineUsersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent();
-                intent.putExtra("PERSONID", mOnlineAdapter.getItem(position));
+                intent.putExtra("PERSONID", mOnlineAdapter.getItem(position).getUid());
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }
         });
 
-        ListView offline = (ListView)findViewById(R.id.offne_users_list);
-        offline.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        offlineUsersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent();
-                intent.putExtra("PERSONID", mOfflineAdapter.getItem(position));
+                intent.putExtra("PERSONID", mOfflineAdapter.getItem(position).getUid());
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }
@@ -83,13 +81,12 @@ public class UsersActivity extends AppCompatActivity {
     private void updateUserLists(DataSnapshot dataSnapshot){
         // When the list of online users in the database changes, remake the list adapter here
 
-        //TODO: getting a permission denied error from firebase, try checking google-services.json
         Log.d(TAG, "updateUserLists");
         mOnlineAdapter.clear();
         mOfflineAdapter.clear();
         Log.d(TAG, dataSnapshot.getKey());
         for (DataSnapshot user: dataSnapshot.getChildren()){
-            String userid = (String) user.child("uid").getValue();
+            final String userid = (String) user.child("uid").getValue();
             DatabaseReference userRef = mDatabase.getReference("/users/" + userid + "/publicFields/");
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -106,11 +103,11 @@ public class UsersActivity extends AppCompatActivity {
                     boolean isConnected = (boolean) isConnectedValue;
                     if (isConnected){
                         Log.d(TAG, username + " online");
-                        mOnlineAdapter.add(username);
+                        mOnlineAdapter.add(new User(username, userid));
                     }
                     else{
                         Log.d(TAG, username + " offline");
-                        mOfflineAdapter.add(username);
+                        mOfflineAdapter.add(new User(username, userid));
                     }
                 }
 

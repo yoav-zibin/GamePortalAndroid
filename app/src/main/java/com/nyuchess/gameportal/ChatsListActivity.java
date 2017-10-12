@@ -57,7 +57,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
                 mChatsAdapter.clear();
                 Log.d(TAG, "onDataChange");
                 for(DataSnapshot chat: dataSnapshot.getChildren()) {
-                    mChatsAdapter.add(chat.getKey().toString());
+                    mChatsAdapter.add(chat.child("groupName").getKey());
                 }
             }
 
