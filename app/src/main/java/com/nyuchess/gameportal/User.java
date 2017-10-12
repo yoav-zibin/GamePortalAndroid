@@ -4,15 +4,19 @@ package com.nyuchess.gameportal;
  * Created by Jordan on 10/5/2017.
  */
 
-public class User {
+class User {
 
     private String displayName;
     private String uid;
 
+    User(String name, String id){
+        displayName = name;
+        uid = id;
+    }
 
-    public String getDisplayName(){
+    String getDisplayName(){
         return displayName;
     }
-    public String getUid() { return uid; }
+    String getUid() { return uid; }
 
 }

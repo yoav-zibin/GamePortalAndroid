@@ -1,7 +1,6 @@
 package com.nyuchess.gameportal;
 
 import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -35,9 +33,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private GoogleApiClient mGoogleApiClient;
 
     private String UID;
-    private int mOnlineViewerCount;
     private TextView mOnlineViewerCountTextView;
-    private int people = 0;
+    private int mOnlineViewerCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,7 +146,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initialiseOnlinePresence() {
-        people = 0;
+        mOnlineViewerCount = 0;
         final DatabaseReference databaseReference = database.getReference();
 
         final DatabaseReference onlineRef = databaseReference.child(".info/connected");
@@ -178,8 +175,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                people = 0;
-                Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + people);
+                mOnlineViewerCount = 0;
+                Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + mOnlineViewerCount);
                 for (DataSnapshot user: dataSnapshot.getChildren()){
                     if(((int) dataSnapshot.getChildrenCount()) > 20) {
                         user.getRef().removeValue();
@@ -194,8 +191,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                                 Log.d(TAG, dataSnapshot.child("isConnected").getValue().toString());
                                 if(dataSnapshot.child("isConnected").getValue().toString().equals("true")) {
                                     addPeople();
-                                    Log.d(TAG, "adding " + people + " " + userid);
-                                    mOnlineViewerCountTextView.setText("Users Online: " + people);
+                                    Log.d(TAG, "adding " + mOnlineViewerCount + " " + userid);
+                                    mOnlineViewerCountTextView.setText("Users Online: " + mOnlineViewerCount);
                                 }
                             }
                         }
@@ -223,6 +220,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void addPeople() {
-        people++;
+        mOnlineViewerCount++;
     }
 }
