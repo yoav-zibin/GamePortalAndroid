@@ -13,9 +13,12 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +44,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton fab =
                 (FloatingActionButton)findViewById(R.id.fab);
 
-        Log.d(TAG, FirebaseDatabase.getInstance().getReference("chats/" + chatID + "/messages").toString());
+        Log.d(TAG, FirebaseDatabase.getInstance().getReference("gamePortal/groups/" + chatID + "/messages").toString());
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +58,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 chat.put("message", input.getText().toString());
                 chat.put("timestamp", ServerValue.TIMESTAMP);
                 FirebaseDatabase.getInstance()
-                        .getReference("chats/" + chatID + "/messages")
+                        .getReference("gamePortal/groups/" + chatID + "/messages")
                         .push()
                         .setValue(chat);
 
@@ -73,7 +76,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         ListView listOfMessages = (ListView)findViewById(R.id.list_of_messages);
 
         adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
-                R.layout.message, FirebaseDatabase.getInstance().getReference("chats/" + chatID + "/messages")) {
+                R.layout.message, FirebaseDatabase.getInstance().getReference("gamePortal/groups/" + chatID + "/messages")) {
             @Override
             protected void populateView(View v, ChatMessage model, int position) {
                 // Get references to the views of message.xml
@@ -106,27 +109,54 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
-        if (requestCode == 1) {
+        if (requestCode == ADD_PEOPLE) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 // The user picked a contact.
                 // The Intent's data Uri identifies which contact was selected.
-                String add = data.getStringExtra("PERSONID");
+                final String add = data.getStringExtra("PERSONID");
 
-                DatabaseReference chats = database.getReference("/chats");
+                DatabaseReference ref = database.getReference("/gamePortal/groups/" + chatID + "/participants");
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        int i = 0;
 
-                Map<String, Object> inChat = new HashMap<>();
-                inChat.put(add, true);
+                        for(int x = 0; x < 10; x ++) {
+                            for(DataSnapshot user : dataSnapshot.getChildren()) {
+                                if(Integer.parseInt(user.child("participantIndex").getValue().toString()) == i) {
+                                    i++;
+                                }
+                            }
+                        }
 
-                chats.child(chatID).child("participants").updateChildren(inChat);
+                        if(i <= 9) {
 
-                DatabaseReference pba = database.getReference("/users/" + add);
-                Map<String, Object> chatInfo = new HashMap<>();
-                chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
-                chatInfo.put("timestamp", ServerValue.TIMESTAMP);
+                            DatabaseReference chats = database.getReference("/gamePortal/groups");
 
-                pba.child("privateButAddable").child("chats").child(chatID).setValue(chatInfo);
-                // Do something with the contact here (bigger example below)
+                            Map<String, Object> index = new HashMap<>();
+                            index.put("participantIndex", i);
+
+                            Map<String, Object> inChat = new HashMap<>();
+                            inChat.put(add, index);
+
+                            chats.child(chatID).child("participants").updateChildren(inChat);
+
+                            DatabaseReference pba = database.getReference("/users/" + add);
+                            Map<String, Object> chatInfo = new HashMap<>();
+                            chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
+                            chatInfo.put("timestamp", ServerValue.TIMESTAMP);
+
+                            pba.child("privateButAddable").child("groups").child(chatID).setValue(chatInfo);
+                            // Do something with the contact here (bigger example below)
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
         }
     }

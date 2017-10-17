@@ -35,9 +35,9 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         // Get the images and other information from Firebase
-        String gameId = savedInstanceState.getString(KEY_ID);
-        mBoard = getBoard(gameId);
-        mGamePieces = getPieces(gameId);
+        //String gameId = savedInstanceState.getString(KEY_ID);
+        //mBoard = getBoard(gameId);
+        //mGamePieces = getPieces(gameId);
     }
 
 

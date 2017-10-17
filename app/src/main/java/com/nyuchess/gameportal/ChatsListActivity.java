@@ -49,7 +49,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         ListView availableChatsList = findViewById(R.id.chats_list);
         availableChatsList.setAdapter(mChatsAdapter);
 
-        DatabaseReference ref = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid() + "/privateButAddable/chats");
+        DatabaseReference ref = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid() + "/privateButAddable/groups");
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -85,10 +85,13 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         int i = v.getId();
         if(i == R.id.newChat) {
             //Add to global chat
-            DatabaseReference chats = database.getReference("/chats");
+            DatabaseReference chats = database.getReference("/gamePortal/groups");
+
+            Map<String, Object> index = new HashMap<>();
+            index.put("participantIndex", 0);
 
             Map<String, Object> inChat = new HashMap<>();
-            inChat.put(mAuth.getCurrentUser().getUid(), true);
+            inChat.put(mAuth.getCurrentUser().getUid(), index);
 
             EditText edit = (EditText)findViewById(R.id.chatName);
             String name = edit.getText().toString(); //gets you the contents of edit text
@@ -107,7 +110,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
             chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
             chatInfo.put("timestamp", ServerValue.TIMESTAMP);
 
-            pba.child("privateButAddable").child("chats").child(push).setValue(chatInfo);
+            pba.child("privateButAddable").child("groups").child(push).setValue(chatInfo);
         }
     }
 }

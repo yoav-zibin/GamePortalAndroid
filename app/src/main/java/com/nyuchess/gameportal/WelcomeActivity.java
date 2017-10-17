@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,6 +50,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.chat_button).setOnClickListener(this);
         findViewById(R.id.people_button).setOnClickListener(this);
         findViewById(R.id.sign_out).setOnClickListener(this);
+        findViewById(R.id.newMatch).setOnClickListener(this);
 
         mWelcomeTextView.setText("Welcome, " + username);
 
@@ -59,19 +61,28 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         DatabaseReference ref = database.getReference("/users");
 
         Map<String, Object> pub = new HashMap<>();
-        pub.put("avatarImageUrl", "https://i0.wp.com/vanillicon.com/f6562c80843af5711653fc76170ddfd6_200.png?ssl=1");
-        String disp = mAuth.getCurrentUser().getDisplayName();
-        if(disp == null || disp.length() < 1) {
-            disp = "TBD";
-        }
-        pub.put("displayName", disp);
+
+        String pic = "https://st2.depositphotos.com/6541572/12372/v/950/depositphotos_123726864-stock-illustration-anonymous-male-profile-picture-emotion.jpg";
+        pub.put("avatarImageUrl", (mAuth.getCurrentUser().getPhotoUrl() == null) ? pic : mAuth.getCurrentUser().getPhotoUrl().toString());
+        pic = null;
+        pub.put("displayName", (mAuth.getCurrentUser().getDisplayName() == null || mAuth.getCurrentUser().getDisplayName().length() < 1 ) ? "TBD" : mAuth.getCurrentUser().getDisplayName());
         pub.put("isConnected", true);
         pub.put("lastSeen", ServerValue.TIMESTAMP);
 
         Map<String, Object> priv = new HashMap<>();
         priv.put("email", mAuth.getCurrentUser().getEmail());
         priv.put("createdOn", ServerValue.TIMESTAMP);
+        priv.put("phoneNumber", (mAuth.getCurrentUser().getPhoneNumber() == null) ? "" : mAuth.getCurrentUser().getPhoneNumber());
+        priv.put("facebookId", (mAuth.getCurrentUser().getProviders().get(0).equals("facebook.com")) ? mAuth.getCurrentUser().getEmail() : "");
+        priv.put("googleId", (mAuth.getCurrentUser().getProviders().get(0).equals("google.com")) ? mAuth.getCurrentUser().getEmail() : "");
+        priv.put("twitterId", (mAuth.getCurrentUser().getProviders().get(0).equals("twitter.com")) ? mAuth.getCurrentUser().getEmail() : "");
+        priv.put("githubId", (mAuth.getCurrentUser().getProviders().get(0).equals("github.com")) ? mAuth.getCurrentUser().getEmail() : "");
+        priv.put("pushNotificationsToken", "");
 
+        Log.d(TAG, "AUSSIE AUSSIE AUSSIE");
+        Log.d(TAG, mAuth.getCurrentUser().getProviderData().toString());
+        Log.d(TAG, mAuth.getCurrentUser().getProviderId());
+        Log.d(TAG, "OI OI OI");
 
         Map<String, Object> fields = new HashMap<>();
         fields.put("publicFields", pub);
@@ -80,19 +91,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         ref.child(mAuth.getCurrentUser().getUid()).updateChildren(fields);
 
         initialiseOnlinePresence();
-
-        //Add to global chat
-        DatabaseReference chats = database.getReference("/chats");
-
-        Map<String, Object> inChat = new HashMap<>();
-        inChat.put(UID, true);
-
-        Map<String, Object> chat = new HashMap<>();
-        chat.put("participants", inChat);
-        chat.put("groupName", "Global");
-        chat.put("createdOn", ServerValue.TIMESTAMP);
-
-        chats.child("GlobalChat").updateChildren(chat);
     }
 
     @Override
@@ -106,6 +104,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             startActivity(intent);
         } else if(i == R.id.sign_out) {
             signOut();
+        } else if(i == R.id.newMatch) {
+            Intent intent = new Intent(this, MatchActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -124,11 +125,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     public void signOut() {
         mAuth.signOut();
 
-        String[] data = username.split(" ");
+        DatabaseReference pubRef = database.getReference("/users/" + UID + "/publicFields");
 
-        DatabaseReference pubRef = database.getReference("/users/" + data[1] + "/publicFields");
-
-        pubRef.child("isConnected").setValue("false");
+        pubRef.child("isConnected").setValue(false);
         pubRef.child("lastSeen").setValue(ServerValue.TIMESTAMP);
 
         Intent intent = new Intent(getBaseContext(), MainActivity.class);
@@ -150,7 +149,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         final DatabaseReference databaseReference = database.getReference();
 
         final DatabaseReference onlineRef = databaseReference.child(".info/connected");
-        final DatabaseReference currentUserRef = databaseReference.child("/recentlyConnected/" + UID);
         final DatabaseReference statusRef = databaseReference.child("/users/" + UID + "/publicFields/isConnected");
         final DatabaseReference lastSeenRef = databaseReference.child("/users/" + UID + "/publicFields/lastSeen");
 
@@ -160,7 +158,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DataSnapshot:" + dataSnapshot);
                 if (dataSnapshot.getValue(Boolean.class)) {
                     lastSeenRef.onDisconnect().setValue(ServerValue.TIMESTAMP);
-                    //statusRef.onDisconnect().setValue("false");
+                    statusRef.onDisconnect().setValue(false);
                     //currentUserRef.onDisconnect().removeValue();
                     //currentUserRef.setValue(true);
                 }
@@ -171,7 +169,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
-        final DatabaseReference onlineViewersCountRef = databaseReference.child("/recentlyConnected");
+        final DatabaseReference onlineViewersCountRef = databaseReference.child("/gamePortal/recentlyConnected");
         onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -182,7 +180,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                         user.getRef().removeValue();
                         return;
                     }
-                    final String userid = (String) user.child("uid").getValue();
+                    final String userid = (String) user.child("userId").getValue();
                     DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
                     isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -211,11 +209,11 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        final DatabaseReference recentRef = databaseReference.child("/recentlyConnected");
+        final DatabaseReference recentRef = databaseReference.child("/gamePortal/recentlyConnected");
         Map<String, Object> me = new HashMap<>();
-        me.put("uid", UID);
+        me.put("userId", UID);
         me.put("timestamp", ServerValue.TIMESTAMP);
-        recentRef.push().setValue(me);
+        recentRef.child(UID).updateChildren(me);
 
     }
 
