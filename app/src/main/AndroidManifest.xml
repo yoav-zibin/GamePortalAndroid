@@ -28,7 +28,9 @@
         <activity android:name=".WelcomeActivity" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".UsersActivity" />
-        <activity android:name=".ChatsListActivity"></activity>
+        <activity android:name=".ChatsListActivity" />
+        <activity android:name=".GameActivity" />
+        <activity android:name=".MatchActivity"></activity>
     </application>
 
 </manifest>

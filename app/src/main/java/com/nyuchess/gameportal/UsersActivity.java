@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -44,7 +43,7 @@ public class UsersActivity extends AppCompatActivity {
         onlineUsersList.setAdapter(mOnlineAdapter);
         offlineUsersList.setAdapter(mOfflineAdapter);
 
-        DatabaseReference ref = mDatabase.getReference("recentlyConnected");
+        DatabaseReference ref = mDatabase.getReference("gamePortal/recentlyConnected");
         Log.d(TAG, "users ref " + ref.toString());
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -86,7 +85,7 @@ public class UsersActivity extends AppCompatActivity {
         mOfflineAdapter.clear();
         Log.d(TAG, dataSnapshot.getKey());
         for (DataSnapshot user: dataSnapshot.getChildren()){
-            final String userid = (String) user.child("uid").getValue();
+            final String userid = (String) user.child("userId").getValue();
             DatabaseReference userRef = mDatabase.getReference("/users/" + userid + "/publicFields/");
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

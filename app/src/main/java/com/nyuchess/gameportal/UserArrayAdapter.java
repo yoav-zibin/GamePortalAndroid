@@ -16,8 +16,6 @@ import java.util.List;
 
 public class UserArrayAdapter extends ArrayAdapter<User> {
 
-    private List<User> mUsers;
-
     public UserArrayAdapter(Context context, List<User> users) {
         super(context, 0, users);
     }
