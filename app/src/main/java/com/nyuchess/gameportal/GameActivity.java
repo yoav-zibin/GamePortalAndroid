@@ -23,8 +23,6 @@ public class GameActivity extends AppCompatActivity {
     private static final String KEY_ID = "GAME_ID";
 
     private List<User> mPlayers;
-    private List<GamePiece> mGamePieces;
-    private GameBoard mBoard;
     private Canvas mCanvas;
     private SurfaceView mSurfaceView;
 
@@ -50,13 +48,13 @@ public class GameActivity extends AppCompatActivity {
         return null;
     }
 
-    private void draw(){
+//    private void draw(){
         // Draw all the game elements, in order from lowest to highest on Z-axis
-        Log.d(TAG, "Drawing game board");
-        mBoard.draw(mCanvas);
-        for (GamePiece piece: mGamePieces){
-            Log.d(TAG, "Drawing piece " + piece);
-            piece.draw(mCanvas);
-        }
-    }
+//        Log.d(TAG, "Drawing game board");
+//        mBoard.draw(mCanvas);
+//        for (GamePiece piece: mGamePieces){
+//            Log.d(TAG, "Drawing piece " + piece);
+//            piece.draw(mCanvas);
+//        }
+//    }
 }

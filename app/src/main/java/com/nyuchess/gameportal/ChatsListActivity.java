@@ -29,7 +29,6 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
     public static final String TAG = "ChatsList";
 
     private ArrayAdapter<String> mChatsAdapter;
-    final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth;
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
@@ -85,7 +84,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         int i = v.getId();
         if(i == R.id.newChat) {
             //Add to global chat
-            DatabaseReference chats = database.getReference("/gamePortal/groups");
+            DatabaseReference chats = mDatabase.getReference("/gamePortal/groups");
 
             Map<String, Object> index = new HashMap<>();
             index.put("participantIndex", 0);
@@ -105,7 +104,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
             chats.child(push).setValue(chat);
             mChatsAdapter.add(push);
 
-            DatabaseReference pba = database.getReference("/users/" + mAuth.getCurrentUser().getUid());
+            DatabaseReference pba = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid());
             Map<String, Object> chatInfo = new HashMap<>();
             chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
             chatInfo.put("timestamp", ServerValue.TIMESTAMP);
