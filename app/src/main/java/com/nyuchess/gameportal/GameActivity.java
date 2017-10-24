@@ -2,6 +2,7 @@ package com.nyuchess.gameportal;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
+import gameplay.Game;
 import gameplay.GameBoard;
 import gameplay.GamePiece;
 
@@ -24,20 +26,23 @@ public class GameActivity extends AppCompatActivity {
 
     private List<User> mPlayers;
     private Canvas mCanvas;
-    private SurfaceView mSurfaceView;
+    private GameView mGameView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
+        Log.d(TAG, "onCreate");
         // Get the images and other information from Firebase
-        //String gameId = savedInstanceState.getString(KEY_ID);
-        //mBoard = getBoard(gameId);
-        //mGamePieces = getPieces(gameId);
-    }
+        String gameId = getIntent().getStringExtra(KEY_ID);
+        Log.d(TAG, "Starting game id: " + gameId);
+        Game game = new Game(gameId);
 
+        mGameView = findViewById(R.id.game_view);
+        mGameView.setGame(game);
+
+    }
 
 
     private GameBoard getBoard(String gameId){

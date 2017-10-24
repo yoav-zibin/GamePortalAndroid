@@ -21,11 +21,6 @@ public class GameFirebaseAdapter {
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
-    List<GamePiece> getGamePieces(String gameId){
-        return null;
-    }
-
-
     //Have to pass in a new GameBoard instead of returning a new one
     //because Java won't let you return from inside a void listener
     //and to access one that's outside the listener it has to be final
@@ -33,14 +28,14 @@ public class GameFirebaseAdapter {
     void getGameBoard(String gameId, final GameBoard board){
 
         Log.d(TAG, "getGameBoard: " + gameId);
-        mDatabase.getReference("gameSpecs").child(gameId).child("board")
+        mDatabase.getReference("gameBuilder/gameSpecs").child(gameId).child("board")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "Got data snapshot for game board");
                 String imageId = dataSnapshot.child("imageId").getValue().toString();
                 String backgroundColor = dataSnapshot.child("backgroundColor").getValue().toString();
-                int maxScale = (Integer) dataSnapshot.child("maxScale").getValue();
+                long maxScale = (Long) dataSnapshot.child("maxScale").getValue();
                 board.setImageId(imageId);
                 board.setBackgroundColor(backgroundColor);
                 board.setMaxScale(maxScale);
@@ -48,9 +43,62 @@ public class GameFirebaseAdapter {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
 
             }
         });
+    }
+
+
+    void getGamePieces(String gameId, final List<GamePiece> pieces){
+        Log.d(TAG, "getGamePieces: " + gameId);
+        mDatabase.getReference("gameBuilder/gameSpecs").child(gameId).child("pieces")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(TAG, "Got data snapshot for game pieces");
+                        for (DataSnapshot piece: dataSnapshot.getChildren()) {
+                            pieces.add(getGamePiece(piece));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "Game pieces read failed: " + databaseError.getMessage());
+                    }
+                });
+    }
+
+    private GamePiece getGamePiece(DataSnapshot dataSnapshot){
+
+        final GamePiece piece = dataSnapshot.getValue(GamePiece.class);
+
+        final String id = dataSnapshot.getKey();
+
+        final String pieceElementId = dataSnapshot.child("pieceElementId").getValue().toString();
+        mDatabase.getReference("gameBuilder/elements").child(pieceElementId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(TAG, "Got data snapshot for piece element " + pieceElementId);
+                        int height = dataSnapshot.child("height").getValue(Integer.class);
+                        int width = dataSnapshot.child("width").getValue(Integer.class);
+                        Log.d(TAG, "Height x Width: " + height + " x " + width);
+                        piece.setHeight(height);
+                        piece.setWidth(width);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "Game piece + " + id + " read failed: " + databaseError.getMessage());
+                    }
+                });
+
+//        GamePiece.PieceState initialState = dataSnapshot.child("initialState")
+//                .getValue(GamePiece.PieceState.class);
+//        piece.setInitialState(initialState);
+
+        return piece;
     }
 
     void saveGame(Game game){

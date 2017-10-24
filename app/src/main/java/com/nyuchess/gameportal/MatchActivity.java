@@ -44,19 +44,19 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
         List<String> availableGames = new ArrayList<>();
         mGamesAdapter = new ArrayAdapter<>(this, R.layout.chat, availableGames);
         mGamesAdapter.clear();
-        mGamesAdapter.add("HEY");
         ListView availableGamesList = findViewById(R.id.games_list);
         availableGamesList.setAdapter(mGamesAdapter);
 
-        DatabaseReference ref = mDatabase.getReference("/gameSpecs/");
+        DatabaseReference ref = mDatabase.getReference("gameBuilder/gameSpecs/");
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mGamesAdapter.clear();
                 Log.d(TAG, "onDataChange");
-                for(DataSnapshot chat: dataSnapshot.getChildren()) {
-                    mGamesAdapter.add(chat.getKey().toString());
+                for(DataSnapshot game: dataSnapshot.getChildren()) {
+                    Log.d(TAG, game.getKey());
+                    mGamesAdapter.add(game.child("gameName").getValue().toString());
                 }
             }
 

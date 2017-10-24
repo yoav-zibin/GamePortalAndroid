@@ -11,7 +11,7 @@ public class GameBoard implements IGameElement {
 
     private String imageId;
     private String backgroundColor;
-    private int maxScale;
+    private long maxScale;
 
     private Bitmap mImage;
 
@@ -43,7 +43,7 @@ public class GameBoard implements IGameElement {
         this.backgroundColor = backgroundColor;
     }
 
-    public void setMaxScale(int maxScale) {
+    public void setMaxScale(long maxScale) {
         this.maxScale = maxScale;
     }
 
