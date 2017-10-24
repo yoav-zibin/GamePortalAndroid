@@ -116,8 +116,6 @@ public class GamePiece implements IGameElement {
                         }
                     });
                 }
-
-//                init(height, width);
             }
 
             @Override
@@ -151,15 +149,6 @@ public class GamePiece implements IGameElement {
         private int zDepth;
         private int currentImageIndex;
 
-//        public PieceState(){}
-//
-//        public PieceState(int x, int y, int zDepth, int currentImageIndex){
-//            this.x = x;
-//            this.y = y;
-//            this.zDepth = zDepth;
-//            this.currentImageIndex = currentImageIndex;
-//        }
-
         public int getX() {
             return x;
         }
@@ -174,6 +163,10 @@ public class GamePiece implements IGameElement {
 
         public int getCurrentImageIndex() {
             return currentImageIndex;
+        }
+
+        public void update(int x, int y, int zDepth, int imageIndex){
+            //TODO: update status here and on firebase, also listen for changes
         }
 
         public String toString(){

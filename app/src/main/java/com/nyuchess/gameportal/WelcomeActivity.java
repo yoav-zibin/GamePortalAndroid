@@ -105,10 +105,10 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         } else if(i == R.id.sign_out) {
             signOut();
         } else if(i == R.id.newMatch) {
-//            Intent intent = new Intent(this, MatchActivity.class);
-//            startActivity(intent);
-            Intent intent = new Intent(this, GameActivity.class);
-            intent.putExtra("GAME_ID", "-Kx61wq6VG5K5NNxbF5L");
+            Intent intent = new Intent(this, MatchActivity.class);
+            startActivity(intent);
+//            Intent intent = new Intent(this, GameActivity.class);
+//            intent.putExtra("GAME_ID", "-Kx61wq6VG5K5NNxbF5L");
             startActivity(intent);
         }
     }

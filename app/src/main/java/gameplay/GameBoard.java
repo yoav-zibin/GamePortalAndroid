@@ -121,34 +121,4 @@ public class GameBoard implements IGameElement {
         // draw shit
     }
 
-
-//    GameBoard(String imageId, String backgroundColor, int maxScale){
-//        this.imageId = imageId;
-//        this.backgroundColor = backgroundColor;
-//        this.maxScale = maxScale;
-//    }
-//
-//    public String getImageId(){
-//        return imageId;
-//    }
-//
-//    public String getBackgroundColor() {
-//        return backgroundColor;
-//    }
-//
-//    public long getMaxScale() {
-//        return maxScale;
-//    }
-//
-//    public void setImageId(String imageId) {
-//        this.imageId = imageId;
-//    }
-//
-//    public void setBackgroundColor(String backgroundColor) {
-//        this.backgroundColor = backgroundColor;
-//    }
-//
-//    public void setMaxScale(long maxScale) {
-//        this.maxScale = maxScale;
-//    }
 }
