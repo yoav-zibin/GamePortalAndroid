@@ -113,8 +113,11 @@ public class GameBoard implements IGameElement {
     public void draw(Canvas canvas) {
         //wait until initialization is done to avoid NullPointerExceptions
         if (!initialized){
+            Log.v(TAG, "not drawing board yet");
             return;
         }
+        Log.v(TAG, "drawing board");
+        canvas.drawBitmap(image, 0, 0, null);
         // draw shit
     }
 

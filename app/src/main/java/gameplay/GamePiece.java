@@ -1,14 +1,22 @@
 package gameplay;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -20,16 +28,18 @@ public class GamePiece implements IGameElement {
     private static final String TAG = "GamePiece";
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private final FirebaseStorage mStorage = FirebaseStorage.getInstance();
 
     private boolean initialized;
 
-    private PieceState initialState;
     private final String pieceElementId;
-    private long deckPieceIndex;
 
+    private PieceState initialState;
     private PieceState currentState;
-    // private int currentImageIndex;
-//    private Bitmap mImage;
+
+    private long deckPieceIndex;
+    private List<Bitmap> images;
+    private int currentImageIndex;
     private int height;
     private int width;
 
@@ -44,58 +54,82 @@ public class GamePiece implements IGameElement {
     public long getDeckPieceIndex() {
         return deckPieceIndex;
     }
-// which players can see this card
-//    private int[] cardVisibility;
-
-
-//    GamePiece(){    }
-
-//    void setInitialState(PieceState state){
-//        initialState = state;
-////        currentState = state;
-//    }
-//
-//    public void setHeight(int height) {
-//        this.height = height;
-//    }
-//
-//    public void setWidth(int width) {
-//        this.width = width;
-//    }
+    // which players can see this card
+    // private int[] cardVisibility;
 
     GamePiece(DataSnapshot dataSnapshot){
         initialized = false;
+        images = new ArrayList<>();
         pieceElementId = dataSnapshot.child("pieceElementId").getValue().toString();
         deckPieceIndex = (Long) dataSnapshot.child("deckPieceIndex").getValue();
         initialState = dataSnapshot.child("initialState").getValue(PieceState.class);
         Log.d(TAG, "initial state: " + initialState);
         currentState = initialState;
-        getFirebaseData(dataSnapshot);
+        getFirebaseData();
     }
 
-    private void getFirebaseData(DataSnapshot dataSnapshot){
-        final String id = dataSnapshot.getKey();
+    private void getFirebaseData(){
         mDatabase.getReference("gameBuilder/elements").child(pieceElementId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                int height = dataSnapshot.child("height").getValue(Integer.class);
-                int width = dataSnapshot.child("width").getValue(Integer.class);
+                final int height = dataSnapshot.child("height").getValue(Integer.class);
+                final int width = dataSnapshot.child("width").getValue(Integer.class);
                 Log.d(TAG, "Height x Width: " + height + " x " + width);
                 Log.d(TAG, "Got data snapshot for piece element " + pieceElementId);
-                //now get the actual image
+                //now get the actual images
+                final int imageCount = (int) dataSnapshot.child("images").getChildrenCount();
+                for (DataSnapshot imageIdDs: dataSnapshot.child("images").getChildren()){
+                    String imageId = imageIdDs.child("imageId").getValue().toString();
+                    mDatabase.getReference("gameBuilder/images/" + imageId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
+                            Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
+                            long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
+                            Log.d(TAG, "sizeInBytes: " + sizeInBytes);
 
-                init(height, width);
+                            StorageReference storageRef = mStorage.getReference(cloudStoragePath);
+                            storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                @Override
+                                public void onSuccess(byte[] bytes) {
+                                    Log.d(TAG, "Image read success");
+                                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                    images.add(image);
+                                    Log.d(TAG, "got " + images.size() + " images");
+                                    //check to see if all images have been gotten before initializing
+                                    if (images.size() == imageCount){
+                                        init(images, height, width);
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    Log.d(TAG, "Game board image read failed: " + exception.getMessage());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d(TAG, "Game piece image read failed: " + databaseError.getMessage());
+                        }
+                    });
+                }
+
+//                init(height, width);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "Game piece + " + id + " read failed: " + databaseError.getMessage());
+                Log.d(TAG, "Game piece read failed: " + databaseError.getMessage());
             }
         });
     }
 
-    private void init(int height, int width){
+    private void init(List<Bitmap> images, int height, int width){
+        Log.d(TAG, "initializing");
+        this.images = images;
         this.height = height;
         this.width = width;
         initialized = true;
@@ -104,8 +138,11 @@ public class GamePiece implements IGameElement {
     @Override
     public void draw(Canvas canvas) {
         if (!initialized){
+            Log.v(TAG, "not yet drawing piece " + pieceElementId);
             return;
         }
+        Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());
+        canvas.drawBitmap(images.get(currentImageIndex), currentState.getX(), currentState.getY(), null);
     }
 
     static class PieceState {
