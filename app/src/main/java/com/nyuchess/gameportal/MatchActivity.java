@@ -15,7 +15,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -27,9 +26,11 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
 
     public static final int FIGHT_PEOPLE = 2;
 
-    private ArrayAdapter<String> mGamesAdapter;
+    private GameArrayAdapter mGamesAdapter;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth;
+
+    private Game selectedGame = null;
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
@@ -41,22 +42,21 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
 
         mAuth = FirebaseAuth.getInstance();
 
-        List<String> availableGames = new ArrayList<>();
-        mGamesAdapter = new ArrayAdapter<>(this, R.layout.chat, availableGames);
+        List<Game> availableGames = new ArrayList<>();
+        mGamesAdapter = new GameArrayAdapter(this, 0, availableGames);
         mGamesAdapter.clear();
-        mGamesAdapter.add("HEY");
         ListView availableGamesList = findViewById(R.id.games_list);
         availableGamesList.setAdapter(mGamesAdapter);
 
-        DatabaseReference ref = mDatabase.getReference("/gameSpecs/");
+        DatabaseReference ref = mDatabase.getReference("/gameBuilder/gameSpecs/");
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mGamesAdapter.clear();
                 Log.d(TAG, "onDataChange");
-                for(DataSnapshot chat: dataSnapshot.getChildren()) {
-                    mGamesAdapter.add(chat.getKey().toString());
+                for(DataSnapshot game: dataSnapshot.getChildren()) {
+                    mGamesAdapter.add(new Game(game.child("gameName").getValue().toString(), game.getKey().toString()));
                 }
             }
 
@@ -72,6 +72,7 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent(v.getContext(), UsersActivity.class);
                 startActivityForResult(intent, FIGHT_PEOPLE);
+                selectedGame = mGamesAdapter.getItem(position);
             }
         });
     }
@@ -85,6 +86,9 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
                 // The Intent's data Uri identifies which contact was selected.
                 Log.d(TAG, data.getStringExtra("PERSONID"));
                 Intent intent = new Intent(this, GameActivity.class);
+                intent.putExtra("PERSONID", data.getStringExtra("PERSONID"));
+                intent.putExtra("GAMENAME", selectedGame.getGameName());
+                intent.putExtra("GAMEID", selectedGame.getId());
                 startActivity(intent);
             }
         }
