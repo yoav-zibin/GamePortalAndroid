@@ -25,29 +25,31 @@ public class GameFirebaseAdapter {
     //because Java won't let you return from inside a void listener
     //and to access one that's outside the listener it has to be final
     //so you can't just use getValue(GameBoard.class) to make a new one
-    void getGameBoard(String gameId, final GameBoard board){
-
-        Log.d(TAG, "getGameBoard: " + gameId);
-        mDatabase.getReference("gameBuilder/gameSpecs").child(gameId).child("board")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "Got data snapshot for game board");
-                String imageId = dataSnapshot.child("imageId").getValue().toString();
-                String backgroundColor = dataSnapshot.child("backgroundColor").getValue().toString();
-                long maxScale = (Long) dataSnapshot.child("maxScale").getValue();
-                board.setImageId(imageId);
-                board.setBackgroundColor(backgroundColor);
-                board.setMaxScale(maxScale);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
-
-            }
-        });
-    }
+//    void getGameBoard(String gameId, final GameBoard board){
+//
+////        final GameBoard[] boardArray = new GameBoard[1];
+//
+//        Log.d(TAG, "getGameBoard: " + gameId);
+//        mDatabase.getReference("gameBuilder/gameSpecs").child(gameId).child("board")
+//                .addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Log.d(TAG, "Got data snapshot for game board");
+//                String imageId = dataSnapshot.child("imageId").getValue().toString();
+//                String backgroundColor = dataSnapshot.child("backgroundColor").getValue().toString();
+//                long maxScale = (Long) dataSnapshot.child("maxScale").getValue();
+//                board.setImageId(imageId);
+//                board.setBackgroundColor(backgroundColor);
+//                board.setMaxScale(maxScale);
+//                board.init();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
+//            }
+//        });
+//    }
 
 
     void getGamePieces(String gameId, final List<GamePiece> pieces){

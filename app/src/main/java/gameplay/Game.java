@@ -19,16 +19,16 @@ public class Game {
 
     public Game(String gameId){
         mGameId = gameId;
-        mGameBoard = new GameBoard();
+        mGameBoard = new GameBoard(gameId);
         mGamePieces = new ArrayList<>();
-        mAdapter = new GameFirebaseAdapter();
-        init();
+//        mAdapter = new GameFirebaseAdapter();
+//        init();
     }
 
-    private void init(){
-        mAdapter.getGameBoard(mGameId, mGameBoard);
-        mAdapter.getGamePieces(mGameId, mGamePieces);
-    }
+//    private void init(){
+//        mAdapter.getGameBoard(mGameId, mGameBoard);
+//        mAdapter.getGamePieces(mGameId, mGamePieces);
+//    }
 
     public void draw(Canvas canvas){
         mGameBoard.draw(canvas);
