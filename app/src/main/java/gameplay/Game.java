@@ -2,7 +2,6 @@ package gameplay;
 
 import android.graphics.Canvas;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +11,6 @@ import java.util.List;
 public class Game {
 
     private String mGameId;
-    private GameFirebaseAdapter mAdapter;
 
     private List<GamePiece> mGamePieces;
     private GameBoard mGameBoard;
@@ -20,15 +18,8 @@ public class Game {
     public Game(String gameId){
         mGameId = gameId;
         mGameBoard = new GameBoard(gameId);
-        mGamePieces = new ArrayList<>();
-//        mAdapter = new GameFirebaseAdapter();
-//        init();
+        mGamePieces = new GamePieces(gameId);
     }
-
-//    private void init(){
-//        mAdapter.getGameBoard(mGameId, mGameBoard);
-//        mAdapter.getGamePieces(mGameId, mGamePieces);
-//    }
 
     public void draw(Canvas canvas){
         mGameBoard.draw(canvas);

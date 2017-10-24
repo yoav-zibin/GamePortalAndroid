@@ -1,13 +1,19 @@
 package gameplay;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 /**
  * Created by Jordan on 10/14/2017.
@@ -18,6 +24,7 @@ public class GameBoard implements IGameElement {
     private static final String TAG = "GameBoard";
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private final FirebaseStorage mStorage = FirebaseStorage.getInstance();
 
     private String mGameId;
 
@@ -25,7 +32,7 @@ public class GameBoard implements IGameElement {
     private String backgroundColor;
     private long maxScale;
 
-    private Bitmap mImage;
+    private Bitmap image;
 
     private boolean initialized;
 
@@ -39,31 +46,63 @@ public class GameBoard implements IGameElement {
     private void getFirebaseData(){
         Log.d(TAG, "getGameBoard: " + mGameId);
         mDatabase.getReference("gameBuilder/gameSpecs").child(mGameId).child("board")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d(TAG, "Got data snapshot for game board");
-                        String imageId = dataSnapshot.child("imageId").getValue().toString();
-                        String backgroundColor = dataSnapshot.child("backgroundColor").getValue().toString();
-                        long maxScale = (Long) dataSnapshot.child("maxScale").getValue();
-                        init(imageId, backgroundColor, maxScale);
-                    }
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d(TAG, "Got data snapshot for game board");
+                    final String imageId = dataSnapshot.child("imageId").getValue().toString();
+                    Log.d(TAG, "imageId: " + imageId);
+                    final String backgroundColor = dataSnapshot.child("backgroundColor").getValue().toString();
+                    final long maxScale = (Long) dataSnapshot.child("maxScale").getValue();
+                    //now get the image
+                    mDatabase.getReference("gameBuilder/images/" + imageId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
-                    }
+                            String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
+                            Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
+                            long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
+                            Log.d(TAG, "sizeInBytes: " + sizeInBytes);
+
+                            StorageReference storageRef = mStorage.getReference(cloudStoragePath);
+
+                            storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                @Override
+                                public void onSuccess(byte[] bytes) {
+                                    Log.d(TAG, "Image read success");
+                                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                    init(image, backgroundColor, maxScale);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    Log.d(TAG, "Game board image read failed: " + exception.getMessage());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d(TAG, "Game board image read failed: " + databaseError.getMessage());
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
+                }
         });
     }
 
     //Set the data and set the initialized flag to show we can start drawing
-    private void init(String imageId, String backgroundColor, long maxScale){
+    private void init(Bitmap image, String backgroundColor, long maxScale){
         //get actual image using id
         Log.d(TAG, "init");
-        this.imageId = imageId;
+        this.image = image;
         this.backgroundColor = backgroundColor;
         this.maxScale = maxScale;
-        Log.d(TAG, "imageId: " + imageId);
+//        Log.d(TAG, "imageId: " + imageId);
         Log.d(TAG, "backgroundColor " + backgroundColor);
         Log.d(TAG, "maxScale: " + maxScale);
         initialized = true;
