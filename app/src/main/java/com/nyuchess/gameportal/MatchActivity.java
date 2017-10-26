@@ -1,5 +1,6 @@
 package com.nyuchess.gameportal;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,11 +35,14 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
+    private String GROUP_ID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_match);
+        GROUP_ID = getIntent().getStringExtra("GROUP_ID");
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -56,7 +60,7 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
                 Log.d(TAG, "onDataChange");
                 for(DataSnapshot game: dataSnapshot.getChildren()) {
                     Log.d(TAG, game.getKey());
-                    mGamesAdapter.add(game.child("gameName").getValue().toString());
+                    mGamesAdapter.add(new Game(game.child("gameName").getValue().toString(), game.getKey().toString()));
                 }
             }
 
@@ -70,28 +74,12 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
         ListView list = (ListView)findViewById(R.id.games_list);
         list.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Intent intent = new Intent(v.getContext(), UsersActivity.class);
-                startActivityForResult(intent, FIGHT_PEOPLE);
-                selectedGame = mGamesAdapter.getItem(position);
+                Intent intent = new Intent();
+                intent.putExtra("GAME_ID", mGamesAdapter.getItem(position).getId());
+                setResult(Activity.RESULT_OK, intent);
+                finish();
             }
         });
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == FIGHT_PEOPLE) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
-                Log.d(TAG, data.getStringExtra("PERSONID"));
-                Intent intent = new Intent(this, GameActivity.class);
-                intent.putExtra("PERSONID", data.getStringExtra("PERSONID"));
-                intent.putExtra("GAMENAME", selectedGame.getGameName());
-                intent.putExtra("GAMEID", selectedGame.getId());
-                startActivity(intent);
-            }
-        }
     }
 
     @Override

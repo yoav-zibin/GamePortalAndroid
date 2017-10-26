@@ -1,7 +1,10 @@
 package gameplay;
 
 import android.graphics.Canvas;
+import android.view.MotionEvent;
+import android.view.View;
 
+import java.security.acl.Group;
 import java.util.List;
 
 /**
@@ -15,10 +18,10 @@ public class Game {
     private List<GamePiece> mGamePieces;
     private GameBoard mGameBoard;
 
-    public Game(String gameId){
+    public Game(String gameId, String MatchId, String GroupId){
         mGameId = gameId;
         mGameBoard = new GameBoard(gameId);
-        mGamePieces = new GamePieces(gameId);
+        mGamePieces = new GamePieces(gameId, MatchId, GroupId);
     }
 
     public void draw(Canvas canvas){
@@ -26,5 +29,9 @@ public class Game {
         for (GamePiece piece: mGamePieces){
             piece.draw(canvas);
         }
+    }
+
+    public List<GamePiece> getPieces() {
+        return mGamePieces;
     }
 }

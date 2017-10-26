@@ -72,8 +72,8 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         ListView list = (ListView)findViewById(R.id.chats_list);
         list.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Intent intent = new Intent(v.getContext(), ChatActivity.class);
-                intent.putExtra("CHATID", mChatsAdapter.getItem(position));
+                Intent intent = new Intent(v.getContext(), GroupActivity.class);
+                intent.putExtra("GROUP_ID", mChatsAdapter.getItem(position));
                 startActivity(intent);
             }
         });

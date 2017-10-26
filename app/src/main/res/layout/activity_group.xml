@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.nyuchess.gameportal.GroupActivity">
+
+    <!--<Button-->
+    <!--android:id="@+id/view_online_users"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/sign_out"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:text="View Online Users"-->
+    <!--android:onClick="viewOnlineUsers"/>-->
+
+
+    <Button
+        android:id="@+id/chat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="54dp"
+        android:text="Chat"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/addPpl"
+        android:layout_toStartOf="@+id/addPpl" />
+
+    <Button
+        android:id="@+id/matches_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Matches"
+        android:layout_alignBaseline="@+id/chat_button"
+        android:layout_alignBottom="@+id/chat_button"
+        android:layout_toRightOf="@+id/addPpl"
+        android:layout_toEndOf="@+id/addPpl" />
+
+    <Button
+        android:id="@+id/addPpl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="55dp"
+        android:text="Add People" />
+</RelativeLayout>

@@ -39,7 +39,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_chat);
 
         mAuth = FirebaseAuth.getInstance();
-        chatID = getIntent().getStringExtra("CHATID");
+        chatID = getIntent().getStringExtra("GROUP_ID");
 
         FloatingActionButton fab =
                 (FloatingActionButton)findViewById(R.id.fab);

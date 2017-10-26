@@ -30,7 +30,9 @@
         <activity android:name=".UsersActivity" />
         <activity android:name=".ChatsListActivity" />
         <activity android:name=".GameActivity" />
-        <activity android:name=".MatchActivity"></activity>
+        <activity android:name=".MatchActivity" />
+        <activity android:name=".GroupActivity" />
+        <activity android:name=".MatchesListActivity"></activity>
     </application>
 
 </manifest>

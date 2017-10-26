@@ -47,10 +47,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         mWelcomeTextView = (TextView) findViewById(R.id.welcome);
         mOnlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
 
-        findViewById(R.id.chat_button).setOnClickListener(this);
+        findViewById(R.id.group_button).setOnClickListener(this);
         findViewById(R.id.people_button).setOnClickListener(this);
         findViewById(R.id.sign_out).setOnClickListener(this);
-        findViewById(R.id.newMatch).setOnClickListener(this);
 
         mWelcomeTextView.setText("Welcome, " + username);
 
@@ -96,7 +95,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         int i = v.getId();
-        if(i == R.id.chat_button) {
+        if(i == R.id.group_button) {
             Intent intent = new Intent(this, ChatsListActivity.class);
             startActivity(intent);
         } else if(i == R.id.people_button) {
@@ -104,12 +103,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             startActivity(intent);
         } else if(i == R.id.sign_out) {
             signOut();
-        } else if(i == R.id.newMatch) {
-            Intent intent = new Intent(this, MatchActivity.class);
-            startActivity(intent);
-//            Intent intent = new Intent(this, GameActivity.class);
-//            intent.putExtra("GAME_ID", "-Kx61wq6VG5K5NNxbF5L");
-            startActivity(intent);
         }
     }
 

@@ -50,6 +50,7 @@ public class GameBoard implements IGameElement {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Log.d(TAG, "Got data snapshot for game board");
+                    Log.d(TAG, mGameId);
                     final String imageId = dataSnapshot.child("imageId").getValue().toString();
                     Log.d(TAG, "imageId: " + imageId);
                     final String backgroundColor = dataSnapshot.child("backgroundColor").getValue().toString();
