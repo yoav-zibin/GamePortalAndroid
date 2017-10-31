@@ -1,13 +1,11 @@
 package com.nyuchess.gameportal;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class MatchesListActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,7 +30,7 @@ public class MatchesListActivity extends AppCompatActivity implements View.OnCli
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
-    private GameArrayAdapter mMatchesAdapter;
+    private MatchArrayAdapter mMatchesAdapter;
 
     public static final String TAG = "MatchesListActivity";
 
@@ -47,8 +44,8 @@ public class MatchesListActivity extends AppCompatActivity implements View.OnCli
 
         findViewById(R.id.new_match).setOnClickListener(this);
 
-        List<Game> availableGames = new ArrayList<>();
-        mMatchesAdapter = new GameArrayAdapter(this, 0, availableGames);
+        List<MatchArrayItem> availableMatches = new ArrayList<>();
+        mMatchesAdapter = new MatchArrayAdapter(this, 0, availableMatches);
         mMatchesAdapter.clear();
         ListView availableMatchesList = findViewById(R.id.list_of_matches);
         availableMatchesList.setAdapter(mMatchesAdapter);
@@ -59,9 +56,24 @@ public class MatchesListActivity extends AppCompatActivity implements View.OnCli
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mMatchesAdapter.clear();
                 Log.d(TAG, "onDataChange");
-                for(DataSnapshot game: dataSnapshot.getChildren()) {
-                    Log.d(TAG, game.getKey());
-                    mMatchesAdapter.add(new Game(game.child("gameSpecId").getValue().toString(), game.getKey()));
+                for(final DataSnapshot match: dataSnapshot.getChildren()) {
+                    Log.d(TAG, match.getKey());
+                    final String gameSpecId = match.child("gameSpecId").getValue().toString();
+                    mDatabase.getReference("gameBuilder/gameSpecs/" + gameSpecId)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String gamename = dataSnapshot.child("gameName").getValue().toString();
+                            mMatchesAdapter.add(new MatchArrayItem(gamename, gameSpecId, match.getKey()));
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
                 }
             }
 
@@ -72,13 +84,12 @@ public class MatchesListActivity extends AppCompatActivity implements View.OnCli
         });
 
         // Wahhhh cuz Android cries if this is in overriden onclick
-        ListView list = (ListView)findViewById(R.id.list_of_matches);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        availableMatchesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent(v.getContext(), GameActivity.class);
-                Log.d(TAG, mMatchesAdapter.getItem(position).getId());
-                intent.putExtra("GAME_ID", mMatchesAdapter.getItem(position).getGameName());
-                intent.putExtra("MATCH_ID", mMatchesAdapter.getItem(position).getId());
+                Log.d(TAG, mMatchesAdapter.getItem(position).getMatchId());
+                intent.putExtra("GAME_ID", mMatchesAdapter.getItem(position).getgameId());
+                intent.putExtra("MATCH_ID", mMatchesAdapter.getItem(position).getMatchId());
                 intent.putExtra("GROUP_ID", GROUP_ID);
                 startActivity(intent);
             }

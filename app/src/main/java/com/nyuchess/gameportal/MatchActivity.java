@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -31,7 +30,7 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth;
 
-    private Game selectedGame = null;
+    private GameArrayItem selectedGame = null;
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
@@ -46,7 +45,7 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
 
         mAuth = FirebaseAuth.getInstance();
 
-        List<Game> availableGames = new ArrayList<>();
+        List<GameArrayItem> availableGames = new ArrayList<>();
         mGamesAdapter = new GameArrayAdapter(this, 0, availableGames);
         mGamesAdapter.clear();
         ListView availableGamesList = findViewById(R.id.games_list);
@@ -60,7 +59,7 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
                 Log.d(TAG, "onDataChange");
                 for(DataSnapshot game: dataSnapshot.getChildren()) {
                     Log.d(TAG, game.getKey());
-                    mGamesAdapter.add(new Game(game.child("gameName").getValue().toString(), game.getKey().toString()));
+                    mGamesAdapter.add(new GameArrayItem(game.child("gameName").getValue().toString(), game.getKey().toString()));
                 }
             }
 

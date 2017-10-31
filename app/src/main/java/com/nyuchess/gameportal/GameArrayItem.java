@@ -4,12 +4,12 @@ package com.nyuchess.gameportal;
  * Created by Vicsta on 10/23/2017.
  */
 
-class Game {
+class GameArrayItem {
 
     private String gameName;
     private String id;
 
-    Game(String name, String id){
+    GameArrayItem(String name, String id){
         gameName = name;
         this.id = id;
     }

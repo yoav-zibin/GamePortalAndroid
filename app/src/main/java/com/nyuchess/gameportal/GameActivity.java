@@ -136,14 +136,14 @@ public class GameActivity extends AppCompatActivity {
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                Log.d(TAG, "Game board image read failed: " + databaseError.getMessage());
+                                Log.d(TAG, "GameArrayItem board image read failed: " + databaseError.getMessage());
                             }
                         });
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
+                        Log.d(TAG, "GameArrayItem board read failed: " + databaseError.getMessage());
                     }
                 });
 

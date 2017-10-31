@@ -12,25 +12,25 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Created by Victor on 10/23/2017.
+ * Created by Jordan on 10/30/2017.
  */
 
-public class GameArrayAdapter extends ArrayAdapter<GameArrayItem> {
+public class MatchArrayAdapter extends ArrayAdapter<MatchArrayItem> {
 
 
-    public GameArrayAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<GameArrayItem> objects) {
+    public MatchArrayAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<MatchArrayItem> objects) {
         super(context, 0, objects);
     }
 
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        GameArrayItem game = getItem(position);
+        MatchArrayItem match = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.user, parent, false);
         }
         TextView username = (TextView) convertView.findViewById(R.id.username);
-        username.setText(game.getGameName());
+        username.setText(match.getGameName());
         return convertView;
     }
 }

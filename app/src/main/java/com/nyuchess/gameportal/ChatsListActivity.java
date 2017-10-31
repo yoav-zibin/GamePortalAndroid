@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -41,7 +40,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
         mAuth = FirebaseAuth.getInstance();
 
-        List<Game> availableChats = new ArrayList<>();
+        List<GameArrayItem> availableChats = new ArrayList<>();
         mChatsAdapter = new GameArrayAdapter(this, R.layout.chat, availableChats);
         mChatsAdapter.clear();
         ListView availableChatsList = findViewById(R.id.chats_list);
@@ -62,7 +61,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
                         public void onDataChange(DataSnapshot group) {
                             Log.d(TAG, group.child("groupName").toString());
                             Log.d(TAG, group.getKey());
-                            mChatsAdapter.add(new Game(group.child("groupName").getValue().toString(), group.getKey()));
+                            mChatsAdapter.add(new GameArrayItem(group.child("groupName").getValue().toString(), group.getKey()));
                         }
 
                         @Override
@@ -116,7 +115,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
             String push = chats.push().toString().replace(chats.getRef().toString() + "/", "");
             chats.child(push).setValue(chat);
-            mChatsAdapter.add(new Game(name, push));
+            mChatsAdapter.add(new GameArrayItem(name, push));
 
             DatabaseReference pba = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid());
             Map<String, Object> chatInfo = new HashMap<>();
