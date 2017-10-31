@@ -28,7 +28,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
     public static final String TAG = "ChatsList";
 
-    private ArrayAdapter<String> mChatsAdapter;
+    private GameArrayAdapter mChatsAdapter;
     private FirebaseAuth mAuth;
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
@@ -41,14 +41,14 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
         mAuth = FirebaseAuth.getInstance();
 
-        List<String> availableChats = new ArrayList<>();
-        mChatsAdapter = new ArrayAdapter<>(this, R.layout.chat, availableChats);
+        List<Game> availableChats = new ArrayList<>();
+        mChatsAdapter = new GameArrayAdapter(this, R.layout.chat, availableChats);
         mChatsAdapter.clear();
-        mChatsAdapter.add("HEY");
         ListView availableChatsList = findViewById(R.id.chats_list);
         availableChatsList.setAdapter(mChatsAdapter);
 
         DatabaseReference ref = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid() + "/privateButAddable/groups");
+
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -56,7 +56,21 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
                 mChatsAdapter.clear();
                 Log.d(TAG, "onDataChange");
                 for(DataSnapshot chat: dataSnapshot.getChildren()) {
-                    mChatsAdapter.add(chat.getKey().toString());
+                    DatabaseReference ref2 = mDatabase.getReference("gamePortal/groups/" + chat.getKey());
+                    ref2.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot group) {
+                            Log.d(TAG, group.child("groupName").toString());
+                            Log.d(TAG, group.getKey());
+                            mChatsAdapter.add(new Game(group.child("groupName").getValue().toString(), group.getKey()));
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             }
 
@@ -73,7 +87,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         list.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent(v.getContext(), GroupActivity.class);
-                intent.putExtra("GROUP_ID", mChatsAdapter.getItem(position));
+                intent.putExtra("GROUP_ID", mChatsAdapter.getItem(position).getId());
                 startActivity(intent);
             }
         });
@@ -102,7 +116,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
             String push = chats.push().toString().replace(chats.getRef().toString() + "/", "");
             chats.child(push).setValue(chat);
-            mChatsAdapter.add(push);
+            mChatsAdapter.add(new Game(name, push));
 
             DatabaseReference pba = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid());
             Map<String, Object> chatInfo = new HashMap<>();

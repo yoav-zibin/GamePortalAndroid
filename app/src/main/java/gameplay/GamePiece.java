@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -15,10 +16,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nyuchess.gameportal.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by Jordan on 10/14/2017.
@@ -47,6 +51,9 @@ public class GamePiece implements IGameElement {
     private String GROUP_ID;
     private String MATCH_ID;
 
+    private int heightScreen = 1;
+    private int widthScreen = 1;
+
     public PieceState getInitialState() {
         return initialState;
     }
@@ -61,7 +68,7 @@ public class GamePiece implements IGameElement {
     // which players can see this card
     // private int[] cardVisibility;
 
-    GamePiece(DataSnapshot dataSnapshot, String mMatchId, String mGroupId){
+    GamePiece(DataSnapshot dataSnapshot, String mGameId, String mMatchId, String mGroupId){
         initialized = false;
         images = new ArrayList<>();
         pieceElementId = dataSnapshot.child("pieceElementId").getValue().toString();
@@ -72,6 +79,35 @@ public class GamePiece implements IGameElement {
         this.pieceIndex = dataSnapshot.getKey();
         GROUP_ID = mGroupId;
         MATCH_ID = mMatchId;
+        Log.d(TAG, "why");
+        mDatabase.getReference("gameBuilder/gameSpecs").child(mGameId).child("board")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(TAG, "first");
+                        final String imageId = dataSnapshot.child("imageId").getValue().toString();
+                        //now get the image
+                        mDatabase.getReference("gameBuilder/images/" + imageId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot image) {
+                                Log.d(TAG, "second");
+                                heightScreen = Integer.parseInt(image.child("height").getValue().toString());
+                                widthScreen = Integer.parseInt(image.child("width").getValue().toString());
+                                getFirebaseData();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.d(TAG, "Game board image read failed: " + databaseError.getMessage());
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
+                    }
+                });
         getFirebaseData();
     }
 
@@ -135,8 +171,8 @@ public class GamePiece implements IGameElement {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                currentState.setX((int)Float.parseFloat(dataSnapshot.child("currentState").child("x").getValue().toString()));
-                currentState.setY((int)Float.parseFloat(dataSnapshot.child("currentState").child("y").getValue().toString()));
+                currentState.setX((int) ((Float.parseFloat(dataSnapshot.child("currentState").child("x").getValue().toString())) / 100 * widthScreen));
+                currentState.setY((int)((Float.parseFloat(dataSnapshot.child("currentState").child("y").getValue().toString())) / 100 * heightScreen));
             }
 
             @Override

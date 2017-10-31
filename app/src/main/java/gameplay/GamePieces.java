@@ -24,6 +24,9 @@ public class GamePieces extends ArrayList<GamePiece> {
     private String mGroupId;
     private String mGameId;
 
+    private int sHeight;
+    private int sWidth;
+
     GamePieces(String gameId, String MatchId, String GroupId){
         super();
         Log.d(TAG, "constructor");
@@ -43,7 +46,7 @@ public class GamePieces extends ArrayList<GamePiece> {
                         Log.d(TAG, mGameId);
                         for (DataSnapshot piece: dataSnapshot.getChildren()) {
 //                            add(getGamePiece(piece));
-                            add(new GamePiece(piece, mMatchId, mGroupId));
+                            add(new GamePiece(piece, mGameId, mMatchId, mGroupId));
                         }
                     }
 

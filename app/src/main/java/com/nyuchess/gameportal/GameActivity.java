@@ -1,8 +1,10 @@
 package com.nyuchess.gameportal;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,8 +12,13 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +42,12 @@ public class GameActivity extends AppCompatActivity {
     private Canvas mCanvas;
     private GameView mGameView;
 
+    private String gameId;
     private String GROUP_ID;
     private String MATCH_ID;
+    private Game game;
+
+    private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,68 +56,98 @@ public class GameActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
 
         // Get the images and other information from Firebase
-        String gameId = getIntent().getStringExtra(KEY_ID);
+        gameId = getIntent().getStringExtra(KEY_ID);
         MATCH_ID = getIntent().getStringExtra("MATCH_ID");
         GROUP_ID = getIntent().getStringExtra("GROUP_ID");
-        Log.d(TAG, "Starting game id: " + gameId);
-        Game game = new Game(gameId, MATCH_ID, GROUP_ID);
-        final Game ongoing = game;
+        game = new Game(gameId, MATCH_ID, GROUP_ID);
         mGameView = findViewById(R.id.game_view);
         mGameView.setGame(game);
 
-        mGameView.setOnTouchListener(new View.OnTouchListener() {
+        mDatabase.getReference("gameBuilder/gameSpecs").child(gameId).child("board")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final String imageId = dataSnapshot.child("imageId").getValue().toString();
+                        //now get the image
+                        mDatabase.getReference("gameBuilder/images/" + imageId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot image) {
+                                final int height = Integer.parseInt(image.child("height").getValue().toString());
+                                final int width = Integer.parseInt(image.child("width").getValue().toString());
+                                final Game ongoing = game;
 
-            private int mPreviousX;
-            private int mPreviousY;
-            GamePiece target = null;
+                                mGameView = findViewById(R.id.game_view);
+                                mGameView.setOnTouchListener(new View.OnTouchListener() {
 
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                int x = (int) event.getX();
-                int y = (int) event.getY();
+                                    private int mPreviousX;
+                                    private int mPreviousY;
+                                    GamePiece target = null;
 
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            for (GamePiece piece : ongoing.getPieces()) {
-                                if (x <= piece.getCurrentState().getX() + piece.getWidth()
-                                        && x >= piece.getCurrentState().getX()
-                                        && y >= piece.getCurrentState().getY()
-                                        && y <= piece.getCurrentState().getY() + piece.getHeight()) {
-                                    target = piece;
-                                    break;
-                                }
+                                    @Override
+                                    public boolean onTouch(View view, MotionEvent event) {
+                                        int x = (int) event.getX();
+                                        int y = (int) event.getY();
+
+                                        switch (event.getAction()) {
+                                            case MotionEvent.ACTION_DOWN:
+                                                for (GamePiece piece : ongoing.getPieces()) {
+                                                    if (x <= piece.getCurrentState().getX() + piece.getWidth()
+                                                            && x >= piece.getCurrentState().getX()
+                                                            && y >= piece.getCurrentState().getY()
+                                                            && y <= piece.getCurrentState().getY() + piece.getHeight()) {
+                                                        target = piece;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case MotionEvent.ACTION_MOVE:
+                                                if (target != null) {
+                                                    int dx = x - mPreviousX;
+                                                    int dy = y - mPreviousY;
+                                                    target.getCurrentState().setX(target.getCurrentState().getX() + dx);
+                                                    target.getCurrentState().setY(target.getCurrentState().getY() + dy);
+                                                    Log.d(TAG, "MOVING");
+                                                    Log.d(TAG, x + "");
+                                                    Log.d(TAG, y + "");
+                                                }
+                                                break;
+
+                                            case MotionEvent.ACTION_UP:
+                                                if(target != null) {
+                                                    Map<String, Object> loc = new HashMap<>();
+                                                    int dx = x - mPreviousX;
+                                                    int dy = y - mPreviousY;
+                                                    loc.put("x", (int)(((((double) target.getCurrentState().getX() + dx) / (double) width)) * 100));
+                                                    loc.put("y", (int) ((((double) target.getCurrentState().getY() + dy) / (double) height) * 100));
+                                                    Log.d(TAG, ((target.getCurrentState().getX() + dx) / width) + "");
+                                                    Log.d(TAG, ((target.getCurrentState().getX() + dx) / height) + "");
+                                                    FirebaseDatabase.getInstance().getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID + "/pieces/" + target.getPieceIndex() + "/currentState").updateChildren(loc);
+                                                    target = null;
+                                                }
+                                                break;
+                                        }
+
+                                        mPreviousX = x;
+                                        mPreviousY = y;
+                                        return true;
+                                    }
+                                });
                             }
-                            break;
-                        case MotionEvent.ACTION_MOVE:
-                            if (target != null) {
-                                int dx = x - mPreviousX;
-                                int dy = y - mPreviousY;
-                                target.getCurrentState().setX(target.getCurrentState().getX() + dx);
-                                target.getCurrentState().setY(target.getCurrentState().getY() + dy);
-                                Log.d(TAG, "MOVING");
-                                Log.d(TAG, x + "");
-                                Log.d(TAG, y + "");
-                            }
-                            break;
 
-                        case MotionEvent.ACTION_UP:
-                            if(target != null) {
-                                Map<String, Object> loc = new HashMap<>();
-                                int dx = x - mPreviousX;
-                                int dy = y - mPreviousY;
-                                loc.put("x", target.getCurrentState().getX() + dx);
-                                loc.put("y", target.getCurrentState().getY() + dy);
-                                FirebaseDatabase.getInstance().getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID + "/pieces/" + target.getPieceIndex() + "/currentState").updateChildren(loc);
-                                target = null;
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.d(TAG, "Game board image read failed: " + databaseError.getMessage());
                             }
-                            break;
+                        });
                     }
 
-                mPreviousX = x;
-                mPreviousY = y;
-                return true;
-            }
-        });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
+                    }
+                });
+
+
     }
 
 
