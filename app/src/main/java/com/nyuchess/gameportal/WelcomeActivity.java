@@ -54,8 +54,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         mAuth = FirebaseAuth.getInstance();
 
         UID = mAuth.getCurrentUser().getUid();
-        username = mAuth.getCurrentUser().getDisplayName();
-        mWelcomeTextView.setText("Welcome, " + username);
 
         DatabaseReference ref = database.getReference("/users");
 
@@ -72,10 +70,17 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         priv.put("email", mAuth.getCurrentUser().getEmail());
         priv.put("createdOn", ServerValue.TIMESTAMP);
         priv.put("phoneNumber", (mAuth.getCurrentUser().getPhoneNumber() == null) ? "" : mAuth.getCurrentUser().getPhoneNumber());
-        priv.put("facebookId", (mAuth.getCurrentUser().getProviders().get(0).equals("facebook.com")) ? mAuth.getCurrentUser().getEmail() : "");
-        priv.put("googleId", (mAuth.getCurrentUser().getProviders().get(0).equals("google.com")) ? mAuth.getCurrentUser().getEmail() : "");
-        priv.put("twitterId", (mAuth.getCurrentUser().getProviders().get(0).equals("twitter.com")) ? mAuth.getCurrentUser().getEmail() : "");
-        priv.put("githubId", (mAuth.getCurrentUser().getProviders().get(0).equals("github.com")) ? mAuth.getCurrentUser().getEmail() : "");
+        if(mAuth.getCurrentUser().getProviders().size() > 0) {
+            priv.put("facebookId", (mAuth.getCurrentUser().getProviders().get(0).equals("facebook.com")) ? mAuth.getCurrentUser().getEmail() : "");
+            priv.put("googleId", (mAuth.getCurrentUser().getProviders().get(0).equals("google.com")) ? mAuth.getCurrentUser().getEmail() : "");
+            priv.put("twitterId", (mAuth.getCurrentUser().getProviders().get(0).equals("twitter.com")) ? mAuth.getCurrentUser().getEmail() : "");
+            priv.put("githubId", (mAuth.getCurrentUser().getProviders().get(0).equals("github.com")) ? mAuth.getCurrentUser().getEmail() : "");
+        } else {
+            priv.put("facebookId", "");
+            priv.put("googleId", "");
+            priv.put("twitterId", "");
+            priv.put("githubId", "");
+        }
         priv.put("pushNotificationsToken", "");
 
         Log.d(TAG, "AUSSIE AUSSIE AUSSIE");
@@ -88,6 +93,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         fields.put("privateFields", priv);
 
         ref.child(mAuth.getCurrentUser().getUid()).updateChildren(fields);
+
+        username = mAuth.getCurrentUser().getDisplayName();
+        mWelcomeTextView.setText("Welcome, " + pub.get("displayName"));
 
         initialiseOnlinePresence();
     }
