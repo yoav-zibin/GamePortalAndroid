@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.nyuchess.gameportal.GooglePlusLoginActivity">
+    tools:context="com.nyuchess.gameportal.authentication.GooglePlusLoginActivity">
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"

@@ -1,12 +1,18 @@
 package com.nyuchess.gameportal;
 
 import android.content.Intent;
-import android.hardware.camera2.params.Face;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+
+import com.nyuchess.gameportal.authentication.AnonymousLoginActivity;
+import com.nyuchess.gameportal.authentication.EmailLoginActivity;
+import com.nyuchess.gameportal.authentication.FacebookLoginActivity;
+import com.nyuchess.gameportal.authentication.GooglePlusLoginActivity;
+import com.nyuchess.gameportal.authentication.PhoneLoginActivity;
+import com.nyuchess.gameportal.authentication.TwitterLoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,6 +20,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
+        FontManager.markAsIconContainer(findViewById(R.id.email_sign_in_button), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.phone_sign_in_button), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.facebook_sign_in_button), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.twitter_sign_in_button), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.gplus_sign_in_button), iconFont);
+
     }
 
     public void doEmailLogin(View view){

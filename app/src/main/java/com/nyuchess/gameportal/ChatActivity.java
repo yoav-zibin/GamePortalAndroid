@@ -86,11 +86,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 // Set their text
                 messageText.setText(model.getMessage());
-                messageUser.setText(model.getSenderUid());
+                // messageUser.setText(model.getSenderUid());
+                setMessageUsername(messageUser, model.getSenderUid());
 
                 // Format the date before showing it
                 messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
                         model.getTimestamp()));
+            }
+
+            private void setMessageUsername(final TextView v, final String uid){
+                final DatabaseReference ref = database.getReference("users/" + uid + "/publicFields/displayName");
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String username = dataSnapshot.getValue().toString();
+                        v.setText(username);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
         };
 

@@ -1,10 +1,7 @@
-package gameplay;
+package com.nyuchess.gameportal.gameplay;
 
 import android.graphics.Canvas;
-import android.view.MotionEvent;
-import android.view.View;
 
-import java.security.acl.Group;
 import java.util.List;
 
 /**

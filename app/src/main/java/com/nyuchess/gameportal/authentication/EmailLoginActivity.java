@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.authentication;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -14,6 +14,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.nyuchess.gameportal.R;
+import com.nyuchess.gameportal.WelcomeActivity;
 
 public class EmailLoginActivity extends AppCompatActivity implements
         View.OnClickListener {
@@ -104,7 +106,6 @@ public class EmailLoginActivity extends AppCompatActivity implements
     private void updateUI(FirebaseUser user) {
         Log.d(TAG, "Swapping Screen");
         Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
-        intent.putExtra("USERNAME", user.getEmail() + " " + user.getUid());
         startActivity(intent);
     }
 

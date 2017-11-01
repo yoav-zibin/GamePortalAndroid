@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fa_icon_facebook">&#xf082;</string>
+    <string name="fa_icon_email">&#xf199;</string>
+    <string name="fa_icon_gplus">&#xf0d4;</string>
+    <string name="fa_icon_twitter">&#xf081;</string>
+    <string name="fa_icon_phone">&#xf098;</string>
+</resources>

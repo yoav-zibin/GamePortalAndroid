@@ -42,7 +42,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        username = getIntent().getStringExtra("USERNAME");
 
         mWelcomeTextView = (TextView) findViewById(R.id.welcome);
         mOnlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
@@ -51,11 +50,12 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.people_button).setOnClickListener(this);
         findViewById(R.id.sign_out).setOnClickListener(this);
 
-        mWelcomeTextView.setText("Welcome, " + username);
 
         mAuth = FirebaseAuth.getInstance();
 
         UID = mAuth.getCurrentUser().getUid();
+        username = mAuth.getCurrentUser().getDisplayName();
+        mWelcomeTextView.setText("Welcome, " + username);
 
         DatabaseReference ref = database.getReference("/users");
 

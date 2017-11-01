@@ -1,4 +1,4 @@
-package gameplay;
+package com.nyuchess.gameportal.gameplay;
 
 import android.graphics.Canvas;
 

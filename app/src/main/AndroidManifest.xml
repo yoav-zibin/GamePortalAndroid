@@ -17,14 +17,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AnonymousLoginActivity"
+            android:name=".authentication.AnonymousLoginActivity"
             android:label="@string/title_activity_anonymous_login"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".EmailLoginActivity" />
-        <activity android:name=".FacebookLoginActivity" />
-        <activity android:name=".GooglePlusLoginActivity" />
-        <activity android:name=".PhoneLoginActivity" />
-        <activity android:name=".TwitterLoginActivity" />
+        <activity android:name=".authentication.EmailLoginActivity" />
+        <activity android:name=".authentication.FacebookLoginActivity" />
+        <activity android:name=".authentication.GooglePlusLoginActivity" />
+        <activity android:name=".authentication.PhoneLoginActivity" />
+        <activity android:name=".authentication.TwitterLoginActivity" />
         <activity android:name=".WelcomeActivity" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".UsersActivity" />

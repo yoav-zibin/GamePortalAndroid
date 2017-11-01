@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.nyuchess.gameportal.PhoneLoginActivity">
+    tools:context="com.nyuchess.gameportal.authentication.PhoneLoginActivity">
 
     <EditText
         android:id="@+id/phone_number"
