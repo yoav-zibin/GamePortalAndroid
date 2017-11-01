@@ -6,51 +6,73 @@
     android:layout_height="match_parent"
     tools:context="com.nyuchess.gameportal.MainActivity">
 
-    <Button
-        android:id="@+id/email_sign_in_button"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Log in"
         android:layout_centerHorizontal="true"
-        android:text="Email"
-        android:onClick="doEmailLogin"/>
-    <Button
-        android:id="@+id/phone_sign_in_button"
+        android:id="@+id/login_text"
+        android:textSize="50sp"/>
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/email_sign_in_button"
+        android:layout_below="@+id/login_text"
         android:layout_centerHorizontal="true"
-        android:text="Phone Number"
-        android:onClick="doPhoneLogin"/>
-    <Button
-        android:id="@+id/facebook_sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/phone_sign_in_button"
-        android:layout_centerHorizontal="true"
-        android:text="Facebook"
-        android:onClick="doFacebookLogin"/>
-    <Button
-        android:id="@+id/twitter_sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/facebook_sign_in_button"
-        android:layout_centerHorizontal="true"
-        android:text="Twitter"
-        android:onClick="doTwitterLogin"/>
-    <Button
-        android:id="@+id/gplus_sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/twitter_sign_in_button"
-        android:layout_centerHorizontal="true"
-        android:text="Google+"
-        android:onClick="doGooglePlusLogin"/>
+        android:id="@+id/login_buttons">
+        <Button
+            android:id="@+id/email_sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/fa_icon_email"
+            android:textSize="30sp"
+            android:textColor="#81c784"
+            android:onClick="doEmailLogin"/>
+        <Button
+            android:id="@+id/phone_sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/fa_icon_phone"
+            android:textSize="30sp"
+            android:textColor="#9b59b6"
+            android:onClick="doPhoneLogin"/>
+        <Button
+            android:id="@+id/facebook_sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/fa_icon_facebook"
+            android:textSize="30sp"
+            android:textColor="#3b5998"
+            android:onClick="doFacebookLogin"/>
+        <Button
+            android:id="@+id/twitter_sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/fa_icon_twitter"
+            android:textSize="30sp"
+            android:textColor="#0084b4"
+            android:onClick="doTwitterLogin"/>
+        <Button
+            android:id="@+id/gplus_sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/fa_icon_gplus"
+            android:textSize="30sp"
+            android:textColor="#d34836"
+            android:onClick="doGooglePlusLogin"/>
+    </LinearLayout>
     <Button
         android:id="@+id/anon_sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/gplus_sign_in_button"
+        android:layout_below="@id/login_buttons"
         android:layout_centerHorizontal="true"
         android:text="Anonymous"
         android:onClick="doAnonymousLogin"/>
+
+
 </RelativeLayout>

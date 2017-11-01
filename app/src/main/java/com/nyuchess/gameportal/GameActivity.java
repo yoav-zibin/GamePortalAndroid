@@ -1,32 +1,24 @@
 package com.nyuchess.gameportal;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import gameplay.Game;
-import gameplay.GameBoard;
-import gameplay.GamePiece;
+import com.nyuchess.gameportal.gameplay.Game;
+import com.nyuchess.gameportal.gameplay.GameBoard;
+import com.nyuchess.gameportal.gameplay.GamePiece;
 
 public class GameActivity extends AppCompatActivity {
 

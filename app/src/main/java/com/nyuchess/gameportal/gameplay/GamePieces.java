@@ -1,4 +1,4 @@
-package gameplay;
+package com.nyuchess.gameportal.gameplay;
 
 import android.util.Log;
 
@@ -7,7 +7,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
 
 /**

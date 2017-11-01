@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.authentication;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -23,6 +23,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.nyuchess.gameportal.R;
+import com.nyuchess.gameportal.WelcomeActivity;
 
 public class GooglePlusLoginActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,

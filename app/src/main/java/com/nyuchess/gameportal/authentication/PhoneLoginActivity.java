@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.authentication;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -21,6 +21,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.nyuchess.gameportal.R;
+import com.nyuchess.gameportal.WelcomeActivity;
 
 import java.util.concurrent.TimeUnit;
 

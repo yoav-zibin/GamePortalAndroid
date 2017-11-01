@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import gameplay.Game;
+import com.nyuchess.gameportal.gameplay.Game;
 
 /**
  * Created by Jordan on 10/23/2017.
