@@ -141,7 +141,7 @@ public class UsersActivity extends AppCompatActivity {
         chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
         chatInfo.put("timestamp", ServerValue.TIMESTAMP);
 
-        pba.child("privateButAddable").child("groups").child(GROUP_ID).updateChildren(chatInfo2);
+        pba2.child("privateButAddable").child("groups").child(GROUP_ID).updateChildren(chatInfo2);
 
         // Create match for group
 
