@@ -74,10 +74,19 @@ public class MatchActivity extends AppCompatActivity implements View.OnClickList
         ListView list = (ListView)findViewById(R.id.games_list);
         list.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Intent intent = new Intent();
-                intent.putExtra("GAME_ID", mGamesAdapter.getItem(position).getId());
-                setResult(Activity.RESULT_OK, intent);
-                finish();
+                String quick = getIntent().getStringExtra("QUICKSTART");
+                if(quick != null && quick.equals("true")) {
+                    Intent intent = new Intent(v.getContext(), UsersActivity.class);
+                    intent.putExtra("GAME_ID", mGamesAdapter.getItem(position).getId());
+                    intent.putExtra("GAME_NAME", mGamesAdapter.getItem(position).getGameName());
+                    intent.putExtra("QUICKSTART", "true");
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent();
+                    intent.putExtra("GAME_ID", mGamesAdapter.getItem(position).getId());
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
+                }
             }
         });
     }
