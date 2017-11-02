@@ -108,10 +108,28 @@ public class UsersActivity extends AppCompatActivity {
                         boolean isConnected = (boolean) isConnectedValue;
                         if (isConnected) {
                             Log.d(TAG, username + " online");
-                            mOnlineAdapter.add(new User(username, userid));
+                            User user = new User(username, userid);
+                            boolean found = false;
+                            for(int i = 0; i < mOnlineAdapter.getCount(); i++) {
+                                if(mOnlineAdapter.getItem(i).getUid().equals(user.getUid())) {
+                                    found = true;
+                                }
+                            }
+                            if(!found) {
+                                mOnlineAdapter.add(user);
+                            }
                         } else {
                             Log.d(TAG, username + " offline");
-                            mOfflineAdapter.add(new User(username, userid));
+                            User user = new User(username, userid);
+                            boolean found = false;
+                            for(int i = 0; i < mOfflineAdapter.getCount(); i++) {
+                                if(mOfflineAdapter.getItem(i).getUid().equals(user.getUid())) {
+                                    found = true;
+                                }
+                            }
+                            if(!found) {
+                                mOfflineAdapter.add(user);
+                            }
                         }
                     }
 
