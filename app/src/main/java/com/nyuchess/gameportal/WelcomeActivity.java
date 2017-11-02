@@ -23,6 +23,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.twitter.sdk.android.core.TwitterCore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -176,11 +177,12 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         });
         final DatabaseReference onlineViewersCountRef = databaseReference.child("/gamePortal/recentlyConnected");
         onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
+            private ArrayList<String> online;
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                mOnlineViewerCount = 0;
+                online = new ArrayList<>();
                 Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + mOnlineViewerCount);
-                for (DataSnapshot user: dataSnapshot.getChildren()) {
+                for (final DataSnapshot user: dataSnapshot.getChildren()) {
                     final String userid = (String) user.child("userId").getValue();
                     if(!userid.equals(UID)) {
                         Log.d(TAG, UID + " " + userid);
@@ -191,9 +193,10 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                                 if (dataSnapshot.child("isConnected").getValue() != null) {
                                     Log.d(TAG, dataSnapshot.child("isConnected").getValue().toString());
                                     if (dataSnapshot.child("isConnected").getValue().toString().equals("true")) {
-                                        addPeople();
-                                        Log.d(TAG, "adding " + mOnlineViewerCount + " " + userid);
-                                        mOnlineViewerCountTextView.setText("Users Online: " + mOnlineViewerCount);
+                                        if(!online.contains(userid)) {
+                                            online.add(userid);
+                                        }
+                                        mOnlineViewerCountTextView.setText("Users Online: " + online.size());
                                     }
                                 }
                             }
