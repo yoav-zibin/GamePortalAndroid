@@ -48,7 +48,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_below="@+id/phone_sign_in_button"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="15dp"
         android:layout_toEndOf="@+id/gplus_sign_in_button"
         android:layout_toRightOf="@+id/gplus_sign_in_button"
         android:layout_weight="1"
@@ -79,7 +79,7 @@
         android:layout_height="100dp"
         android:layout_below="@+id/twitter_sign_in_button"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="17dp"
+        android:layout_marginTop="15dp"
         android:layout_weight="1"
         android:onClick="doGooglePlusLogin"
         android:text="@string/fa_icon_gplus"
@@ -93,7 +93,7 @@
         android:background="#d9d9d9"
         android:layout_below="@+id/gplus_sign_in_button"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15dp"
         android:onClick="doAnonymousLogin"
         android:text="Anonymous" />
 
