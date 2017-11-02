@@ -88,8 +88,8 @@
 
     <Button
         android:id="@+id/anon_sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="150dp"
+        android:layout_width="125dp"
+        android:layout_height="75dp"
         android:background="#d9d9d9"
         android:layout_below="@+id/gplus_sign_in_button"
         android:layout_centerHorizontal="true"
