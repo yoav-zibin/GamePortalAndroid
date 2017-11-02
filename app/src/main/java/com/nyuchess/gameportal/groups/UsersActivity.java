@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -134,14 +135,14 @@ public class UsersActivity extends AppCompatActivity {
         chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
         chatInfo.put("timestamp", ServerValue.TIMESTAMP);
 
-        pba.child("privateButAddable").child("groups").child(GROUP_ID).updateChildren(chatInfo);
+        pba.child("privateButAddable").child("groups").child(GROUP_ID).setValue(chatInfo);
 
         DatabaseReference pba2 = mDatabase.getReference("/users/" + PERSON_ID);
         Map<String, Object> chatInfo2 = new HashMap<>();
-        chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
-        chatInfo.put("timestamp", ServerValue.TIMESTAMP);
+        chatInfo2.put("addedByUid", mAuth.getCurrentUser().getUid());
+        chatInfo2.put("timestamp", ServerValue.TIMESTAMP);
 
-        pba2.child("privateButAddable").child("groups").child(GROUP_ID).updateChildren(chatInfo2);
+        pba2.child("privateButAddable").child("groups").child(GROUP_ID).setValue(chatInfo2);
 
         // Create match for group
 
