@@ -64,7 +64,18 @@ public class MatchesListActivity extends AppCompatActivity implements View.OnCli
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             String gamename = dataSnapshot.child("gameName").getValue().toString();
-                            mMatchesAdapter.add(new MatchArrayItem(gamename, gameSpecId, match.getKey()));
+                            MatchArrayItem matchInList = new MatchArrayItem(gamename, gameSpecId, match.getKey());
+                            boolean found = false;
+                            for(int i = 0; i < mMatchesAdapter.getCount(); i++) {
+                                if(mMatchesAdapter.getItem(i).getGameName().equals(matchInList.getGameName())
+                                        && mMatchesAdapter.getItem(i).getgameId().equals(matchInList.getgameId())
+                                        && mMatchesAdapter.getItem(i).getMatchId().equals(matchInList.getMatchId())) {
+                                    found = true;
+                                }
+                            }
+                            if(!found) {
+                                mMatchesAdapter.add(matchInList);
+                            }
                         }
 
                         @Override
