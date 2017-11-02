@@ -12,13 +12,14 @@ public class Game {
 
     private String mGameId;
 
-    private List<GamePiece> mGamePieces;
+    private GamePieces mGamePieces;
     private GameBoard mGameBoard;
 
     public Game(String gameId, String MatchId, String GroupId){
         mGameId = gameId;
         mGameBoard = new GameBoard(gameId);
         mGamePieces = new GamePieces(gameId, MatchId, GroupId);
+        mGamePieces.init();
     }
 
     public void draw(Canvas canvas){

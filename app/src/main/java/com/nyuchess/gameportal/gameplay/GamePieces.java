@@ -32,6 +32,9 @@ public class GamePieces extends ArrayList<GamePiece> {
         mMatchId = MatchId;
         mGroupId = GroupId;
         mGameId = gameId;
+    }
+
+    void init(){
         getFirebaseData();
     }
 
@@ -45,7 +48,9 @@ public class GamePieces extends ArrayList<GamePiece> {
                         Log.d(TAG, mGameId);
                         for (DataSnapshot piece: dataSnapshot.getChildren()) {
 //                            add(getGamePiece(piece));
-                            add(new GamePiece(piece, mGameId, mMatchId, mGroupId));
+                            GamePiece gamePiece = new GamePiece(mGameId, mMatchId, mGroupId);
+                            gamePiece.startInit(piece);
+                            add(gamePiece);
                         }
                     }
 

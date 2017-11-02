@@ -27,12 +27,12 @@ public class GamePiece implements IGameElement {
 
     private static final String TAG = "GamePiece";
 
-    private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-    private final FirebaseStorage mStorage = FirebaseStorage.getInstance();
+    private FirebaseDatabase mDatabase;
+    private FirebaseStorage mStorage;
 
     private boolean initialized;
 
-    private final String pieceElementId;
+    private String pieceElementId;
 
     private PieceState initialState;
     private PieceState currentState;
@@ -41,10 +41,11 @@ public class GamePiece implements IGameElement {
     private List<Bitmap> images;
     private String pieceIndex;
     private int currentImageIndex;
-    private int height;
-    private int width;
-    private String GROUP_ID;
-    private String MATCH_ID;
+    private int mHeight;
+    private int mWidth;
+    private String mGroupId;
+    private String mMatchId;
+    private String mGameId;
 
     private int heightScreen = 1;
     private int widthScreen = 1;
@@ -63,47 +64,50 @@ public class GamePiece implements IGameElement {
     // which players can see this card
     // private int[] cardVisibility;
 
-    GamePiece(DataSnapshot dataSnapshot, String mGameId, String mMatchId, String mGroupId){
+    GamePiece(String gameId, String matchId, String groupId){
         initialized = false;
+        mGroupId = groupId;
+        mMatchId = matchId;
+        mGameId = gameId;
         images = new ArrayList<>();
+    }
+
+    void startInit(DataSnapshot dataSnapshot){
+        mDatabase = FirebaseDatabase.getInstance();
+       mStorage = FirebaseStorage.getInstance();
         pieceElementId = dataSnapshot.child("pieceElementId").getValue().toString();
         deckPieceIndex = (Long) dataSnapshot.child("deckPieceIndex").getValue();
         initialState = dataSnapshot.child("initialState").getValue(PieceState.class);
         Log.d(TAG, "initial state: " + initialState);
         currentState = initialState;
         this.pieceIndex = dataSnapshot.getKey();
-        GROUP_ID = mGroupId;
-        MATCH_ID = mMatchId;
-        Log.d(TAG, "why");
         mDatabase.getReference("gameBuilder/gameSpecs").child(mGameId).child("board")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d(TAG, "first");
                         final String imageId = dataSnapshot.child("imageId").getValue().toString();
                         //now get the image
                         mDatabase.getReference("gameBuilder/images/" + imageId).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot image) {
-                                Log.d(TAG, "second");
                                 heightScreen = Integer.parseInt(image.child("height").getValue().toString());
                                 widthScreen = Integer.parseInt(image.child("width").getValue().toString());
+                                //get the actual image itself
                                 getFirebaseData();
                             }
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                Log.d(TAG, "Game board image read failed: " + databaseError.getMessage());
+                                Log.d(TAG, "Game piece image read failed: " + databaseError.getMessage());
                             }
                         });
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "Game board read failed: " + databaseError.getMessage());
+                        Log.d(TAG, "Game piece read failed: " + databaseError.getMessage());
                     }
                 });
-        getFirebaseData();
     }
 
     private void getFirebaseData() {
@@ -137,13 +141,13 @@ public class GamePiece implements IGameElement {
                                             Log.d(TAG, "got " + images.size() + " images");
                                             //check to see if all images have been gotten before initializing
                                             if (images.size() == imageCount) {
-                                                init(images, height, width);
+                                                finishInit(images, height, width);
                                             }
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception exception) {
-                                            Log.d(TAG, "Game board image read failed: " + exception.getMessage());
+                                            Log.d(TAG, "Game piece image read failed: " + exception.getMessage());
                                         }
                                     });
                                 }
@@ -162,26 +166,38 @@ public class GamePiece implements IGameElement {
                     }
                 });
 
-        FirebaseDatabase.getInstance().getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID + "/pieces/" + pieceIndex).addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                currentState.setX((int) ((Float.parseFloat(dataSnapshot.child("currentState").child("x").getValue().toString())) / 100 * widthScreen));
-                currentState.setY((int)((Float.parseFloat(dataSnapshot.child("currentState").child("y").getValue().toString())) / 100 * heightScreen));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
-    private void init(List<Bitmap> images, int height, int width){
+    private void finishInit(List<Bitmap> images, int height, int width){
         Log.d(TAG, "initializing");
         this.images = images;
-        this.height = height;
-        this.width = width;
+        this.mHeight = height;
+        this.mWidth = width;
+
+        //add listener for changing state
+        FirebaseDatabase.getInstance().getReference(
+                "gamePortal/groups/" + mGroupId + "/matches/" + mMatchId + "/pieces/" + pieceIndex)
+                .addValueEventListener(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
+                                .child("x").getValue().toString())) / 100 * widthScreen);
+                        int y = (int)((Float.parseFloat(dataSnapshot.child("currentState")
+                                .child("y").getValue().toString())) / 100 * heightScreen);
+                        int zDepth = (int)((Float.parseFloat(dataSnapshot.child("currentState")
+                                .child("zDepth").getValue().toString())) / 100 * heightScreen);
+                        int currentImageIndex = (int)((Float.parseFloat(dataSnapshot.child("currentState")
+                                .child("currentImageIndex").getValue().toString())) / 100 * heightScreen);
+                        currentState.update(x, y, zDepth, currentImageIndex);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
         initialized = true;
     }
 
@@ -195,15 +211,27 @@ public class GamePiece implements IGameElement {
         canvas.drawBitmap(images.get(currentImageIndex), currentState.getX(), currentState.getY(), null);
     }
 
+    public String getGroupId() {
+        return mGroupId;
+    }
+
+    public String getMatchId() {
+        return mMatchId;
+    }
+
+    public String getGameId() {
+        return mGameId;
+    }
+
     public void setCurrentState(PieceState state) { this.currentState = state; }
 
     public void setInitialState(PieceState state) { this.initialState = state; }
 
     public PieceState getCurrentState() { return currentState; }
 
-    public int getHeight() { return height; }
+    public int getHeight() { return mHeight; }
 
-    public int getWidth() {return width; }
+    public int getWidth() {return mWidth; }
 
     public String getPieceIndex() { return pieceIndex; }
 
@@ -234,11 +262,25 @@ public class GamePiece implements IGameElement {
         }
 
         public void update(int x, int y, int zDepth, int imageIndex){
-            //TODO: update status here and on firebase, also listen for changes
+            this.x = x;
+            this.y = y;
+            this.zDepth = zDepth;
+            this.currentImageIndex = imageIndex;
         }
 
         public String toString(){
             return String.format(Locale.US, "%d %d %d %s", x, y, zDepth, currentImageIndex);
+        }
+
+        PieceState(){
+            //no-arg constructor for Firebase
+        }
+
+        public PieceState(int x, int y, int zDepth, int currentImageIndex){
+            this.x = x;
+            this.y = y;
+            this.zDepth = zDepth;
+            this.currentImageIndex = currentImageIndex;
         }
     }
 
