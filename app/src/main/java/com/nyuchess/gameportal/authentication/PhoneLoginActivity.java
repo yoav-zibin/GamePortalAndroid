@@ -22,7 +22,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.nyuchess.gameportal.R;
-import com.nyuchess.gameportal.WelcomeActivity;
 
 import java.util.concurrent.TimeUnit;
 

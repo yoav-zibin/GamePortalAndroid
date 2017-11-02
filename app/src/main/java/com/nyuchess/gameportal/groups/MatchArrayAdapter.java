@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.groups;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.nyuchess.gameportal.R;
 
 import java.util.List;
 

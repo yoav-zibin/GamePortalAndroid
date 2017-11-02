@@ -1,7 +1,6 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.chat;
 
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -20,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.nyuchess.gameportal.R;
 
 import java.util.HashMap;
 import java.util.Map;

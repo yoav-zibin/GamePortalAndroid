@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.groups;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nyuchess.gameportal.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -24,7 +24,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.nyuchess.gameportal.R;
-import com.nyuchess.gameportal.WelcomeActivity;
 
 public class GooglePlusLoginActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,

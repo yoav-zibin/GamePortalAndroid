@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.util;
 
 import android.content.Context;
 import android.graphics.Typeface;

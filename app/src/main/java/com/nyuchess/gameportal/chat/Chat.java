@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.chat;
 
 /**
  * Created by Victor on 10/11/2017.

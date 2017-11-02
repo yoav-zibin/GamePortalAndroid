@@ -5,7 +5,7 @@
     android:id="@+id/activity_chat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.nyuchess.gameportal.MatchesListActivity">
+    tools:context="com.nyuchess.gameportal.groups.MatchesListActivity">
 
     <ListView
         android:layout_width="match_parent"

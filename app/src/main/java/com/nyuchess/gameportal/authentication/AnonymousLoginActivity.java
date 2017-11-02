@@ -14,7 +14,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.nyuchess.gameportal.R;
-import com.nyuchess.gameportal.WelcomeActivity;
 
 public class AnonymousLoginActivity extends AppCompatActivity implements
         View.OnClickListener {

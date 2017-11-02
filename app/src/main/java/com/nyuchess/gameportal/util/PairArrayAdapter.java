@@ -1,36 +1,39 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.util;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.nyuchess.gameportal.R;
+
 import java.util.List;
 
 /**
- * Created by Victor on 10/23/2017.
+ * Created by Jordan on 11/2/2017.
  */
 
-public class GameArrayAdapter extends ArrayAdapter<GameArrayItem> {
+public class PairArrayAdapter<T, S> extends ArrayAdapter<Pair<T, S>> {
 
 
-    public GameArrayAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<GameArrayItem> objects) {
+    public PairArrayAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<Pair<T, S>> objects) {
         super(context, 0, objects);
     }
 
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        GameArrayItem game = getItem(position);
+        Pair<T, S> pair = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.user, parent, false);
         }
         TextView username = (TextView) convertView.findViewById(R.id.username);
-        username.setText(game.getGameName());
+        username.setText(pair.first.toString());
         return convertView;
     }
 }

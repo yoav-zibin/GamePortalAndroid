@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.groups;
 
 /**
  * Created by Jordan on 10/30/2017.

@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.authentication;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -11,12 +11,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
-import com.nyuchess.gameportal.authentication.AnonymousLoginActivity;
-import com.nyuchess.gameportal.authentication.EmailLoginActivity;
-import com.nyuchess.gameportal.authentication.FacebookLoginActivity;
-import com.nyuchess.gameportal.authentication.GooglePlusLoginActivity;
-import com.nyuchess.gameportal.authentication.PhoneLoginActivity;
-import com.nyuchess.gameportal.authentication.TwitterLoginActivity;
+import com.nyuchess.gameportal.util.FontManager;
+import com.nyuchess.gameportal.R;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

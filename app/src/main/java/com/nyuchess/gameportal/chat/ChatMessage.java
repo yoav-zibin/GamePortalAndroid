@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.chat;
 
 import com.google.firebase.database.ServerValue;
 

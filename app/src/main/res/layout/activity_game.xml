@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.nyuchess.gameportal.GameActivity">
+    tools:context="com.nyuchess.gameportal.gameplay.GameActivity">
 
-    <com.nyuchess.gameportal.GameView
+    <com.nyuchess.gameportal.gameplay.GameView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/game_view"
         android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.gameplay;
 
 import android.graphics.Canvas;
 import android.support.v7.app.AppCompatActivity;
@@ -16,9 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.nyuchess.gameportal.gameplay.Game;
-import com.nyuchess.gameportal.gameplay.GameBoard;
-import com.nyuchess.gameportal.gameplay.GamePiece;
+import com.nyuchess.gameportal.R;
+import com.nyuchess.gameportal.groups.User;
 
 public class GameActivity extends AppCompatActivity {
 

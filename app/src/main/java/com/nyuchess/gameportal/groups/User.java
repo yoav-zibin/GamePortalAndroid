@@ -1,10 +1,10 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.groups;
 
 /**
  * Created by Jordan on 10/5/2017.
  */
 
-class User {
+public class User {
 
     private String displayName;
     private String uid;

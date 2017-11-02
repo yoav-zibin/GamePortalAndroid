@@ -1,4 +1,4 @@
-package com.nyuchess.gameportal;
+package com.nyuchess.gameportal.groups;
 
 /**
  * Created by Vicsta on 10/23/2017.
