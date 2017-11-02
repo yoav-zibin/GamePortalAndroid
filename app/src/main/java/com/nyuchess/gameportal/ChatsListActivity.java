@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -28,7 +29,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
     public static final String TAG = "ChatsList";
 
-    private GameArrayAdapter mChatsAdapter;
+    private PairArrayAdapter<String, String> mChatsAdapter;
     private FirebaseAuth mAuth;
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
@@ -41,8 +42,8 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
         mAuth = FirebaseAuth.getInstance();
 
-        List<GameArrayItem> availableChats = new ArrayList<>();
-        mChatsAdapter = new GameArrayAdapter(this, R.layout.chat, availableChats);
+        List<Pair<String, String>> availableChats = new ArrayList<>();
+        mChatsAdapter = new PairArrayAdapter<>(this, R.layout.chat, availableChats);
         mChatsAdapter.clear();
         ListView availableChatsList = findViewById(R.id.chats_list);
         availableChatsList.setAdapter(mChatsAdapter);
@@ -63,11 +64,11 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
                         public void onDataChange(DataSnapshot group) {
                             Log.d(TAG, group.child("groupName").toString());
                             Log.d(TAG, group.getKey());
-                            GameArrayItem inGroup = new GameArrayItem(group.child("groupName").getValue().toString(), group.getKey());
+                            Pair<String, String> inGroup = new Pair<>(group.child("groupName").getValue().toString(), group.getKey());
                             boolean found = false;
                             for(int i = 0; i < mChatsAdapter.getCount(); i++) {
-                                if(mChatsAdapter.getItem(i).getGameName().equals(inGroup.getGameName())
-                                        && mChatsAdapter.getItem(i).getId().equals(inGroup.getId())) {
+                                if(mChatsAdapter.getItem(i).first.equals(inGroup.first)
+                                        && mChatsAdapter.getItem(i).second.equals(inGroup.second)) {
                                     found = true;
                                 }
                             }
@@ -98,7 +99,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         list.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent(v.getContext(), GroupActivity.class);
-                intent.putExtra("GROUP_ID", mChatsAdapter.getItem(position).getId());
+                intent.putExtra("GROUP_ID", mChatsAdapter.getItem(position).second);
                 startActivity(intent);
             }
         });
@@ -135,7 +136,7 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
 
                 String push = chats.push().toString().replace(chats.getRef().toString() + "/", "");
                 chats.child(push).setValue(chat);
-                mChatsAdapter.add(new GameArrayItem(name, push));
+                mChatsAdapter.add(new Pair<>(name, push));
 
                 DatabaseReference pba = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid());
                 Map<String, Object> chatInfo = new HashMap<>();
