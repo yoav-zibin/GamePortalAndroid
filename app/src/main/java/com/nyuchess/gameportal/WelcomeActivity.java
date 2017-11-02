@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -20,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.twitter.sdk.android.core.TwitterCore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,13 +38,17 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private String UID;
     private TextView mOnlineViewerCountTextView;
     private int mOnlineViewerCount = 0;
+    private String provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-
+        provider = getIntent().getStringExtra("PROVIDER");
+        if(provider == null) {
+            provider = "";
+        }
         mWelcomeTextView = (TextView) findViewById(R.id.welcome);
         mOnlineViewerCountTextView = (TextView) findViewById(R.id.users_online);
 
@@ -54,6 +60,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         mAuth = FirebaseAuth.getInstance();
 
         UID = mAuth.getCurrentUser().getUid();
+
+        Toast.makeText(WelcomeActivity.this, UID,
+                Toast.LENGTH_SHORT).show();
 
         DatabaseReference ref = database.getReference("/users");
 
@@ -67,20 +76,13 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         pub.put("lastSeen", ServerValue.TIMESTAMP);
 
         Map<String, Object> priv = new HashMap<>();
-        priv.put("email", mAuth.getCurrentUser().getEmail());
+        priv.put("email", (mAuth.getCurrentUser().getEmail() == null) ? "" : mAuth.getCurrentUser().getEmail());
         priv.put("createdOn", ServerValue.TIMESTAMP);
         priv.put("phoneNumber", (mAuth.getCurrentUser().getPhoneNumber() == null) ? "" : mAuth.getCurrentUser().getPhoneNumber());
-        if(mAuth.getCurrentUser().getProviders().size() > 0) {
-            priv.put("facebookId", (mAuth.getCurrentUser().getProviders().get(0).equals("facebook.com")) ? mAuth.getCurrentUser().getEmail() : "");
-            priv.put("googleId", (mAuth.getCurrentUser().getProviders().get(0).equals("google.com")) ? mAuth.getCurrentUser().getEmail() : "");
-            priv.put("twitterId", (mAuth.getCurrentUser().getProviders().get(0).equals("twitter.com")) ? mAuth.getCurrentUser().getEmail() : "");
-            priv.put("githubId", (mAuth.getCurrentUser().getProviders().get(0).equals("github.com")) ? mAuth.getCurrentUser().getEmail() : "");
-        } else {
-            priv.put("facebookId", "");
-            priv.put("googleId", "");
-            priv.put("twitterId", "");
-            priv.put("githubId", "");
-        }
+        priv.put("facebookId", "");
+        priv.put("googleId", "");
+        priv.put("twitterId", "");
+        priv.put("githubId", "");
         priv.put("pushNotificationsToken", "");
 
         Log.d(TAG, "AUSSIE AUSSIE AUSSIE");
@@ -96,7 +98,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         username = mAuth.getCurrentUser().getDisplayName();
         mWelcomeTextView.setText("Welcome, " + pub.get("displayName"));
-
         initialiseOnlinePresence();
     }
 
@@ -146,6 +147,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                         }
                     });
         }
+        if(provider.equals("TWITTER")) {
+            TwitterCore.getInstance().getSessionManager().clearActiveSession();
+        }
     }
 
     private void initialiseOnlinePresence() {
@@ -179,11 +183,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 mOnlineViewerCount = 0;
                 Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + mOnlineViewerCount);
-                for (DataSnapshot user: dataSnapshot.getChildren()){
-                    if(((int) dataSnapshot.getChildrenCount()) > 20) {
-                        user.getRef().removeValue();
-                        return;
-                    }
+                for (DataSnapshot user: dataSnapshot.getChildren()) {
                     final String userid = (String) user.child("userId").getValue();
                     DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
                     isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {

@@ -39,6 +39,14 @@ dependencies {
     compile 'com.google.firebase:firebase-database:11.4.0'
     compile 'com.firebaseui:firebase-ui-database:1.1.1'
     testCompile 'junit:junit:4.12'
+
+    // Twitter Android SDK (only required for Twitter Login)
+    compile('com.twitter.sdk.android:twitter-core:2.3.0@aar') {
+        transitive = true
+    }
+    compile('com.twitter.sdk.android:twitter:3.1.1@aar') {
+        transitive = true
+    }
 }
 
 
