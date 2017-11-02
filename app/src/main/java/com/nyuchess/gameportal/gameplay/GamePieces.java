@@ -13,18 +13,14 @@ import java.util.ArrayList;
  * Created by Jordan on 10/23/2017.
  */
 
-public class GamePieces extends ArrayList<GamePiece> {
+class GamePieces extends ArrayList<GamePiece> {
 
     private static final String TAG = "GamePieces";
-    private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-
+    private FirebaseDatabase mDatabase;
 
     private String mMatchId;
     private String mGroupId;
     private String mGameId;
-
-    private int sHeight;
-    private int sWidth;
 
     GamePieces(String gameId, String MatchId, String GroupId){
         super();
@@ -35,6 +31,7 @@ public class GamePieces extends ArrayList<GamePiece> {
     }
 
     void init(){
+        mDatabase = FirebaseDatabase.getInstance();
         getFirebaseData();
     }
 
@@ -61,4 +58,7 @@ public class GamePieces extends ArrayList<GamePiece> {
                 });
     }
 
+    String getGameId() {
+        return mGameId;
+    }
 }

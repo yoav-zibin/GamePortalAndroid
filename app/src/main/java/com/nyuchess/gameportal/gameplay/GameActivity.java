@@ -51,6 +51,7 @@ public class GameActivity extends AppCompatActivity {
         MATCH_ID = getIntent().getStringExtra("MATCH_ID");
         GROUP_ID = getIntent().getStringExtra("GROUP_ID");
         game = new Game(gameId, MATCH_ID, GROUP_ID);
+        game.init();
         mGameView = findViewById(R.id.game_view);
         mGameView.setGame(game);
 

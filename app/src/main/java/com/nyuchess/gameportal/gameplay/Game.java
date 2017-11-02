@@ -15,21 +15,33 @@ public class Game {
     private GamePieces mGamePieces;
     private GameBoard mGameBoard;
 
-    public Game(String gameId, String MatchId, String GroupId){
+    Game(String gameId, String matchId, String groupId){
         mGameId = gameId;
         mGameBoard = new GameBoard(gameId);
-        mGamePieces = new GamePieces(gameId, MatchId, GroupId);
+        mGamePieces = new GamePieces(gameId, matchId, groupId);
+    }
+
+    void init(){
+        mGameBoard.init();
         mGamePieces.init();
     }
 
-    public void draw(Canvas canvas){
+    void draw(Canvas canvas){
         mGameBoard.draw(canvas);
         for (GamePiece piece: mGamePieces){
             piece.draw(canvas);
         }
     }
 
-    public List<GamePiece> getPieces() {
+    String getGameId() {
+        return mGameId;
+    }
+
+    GameBoard getBoard() {
+        return mGameBoard;
+    }
+
+    GamePieces getPieces() {
         return mGamePieces;
     }
 }

@@ -23,8 +23,8 @@ public class GameBoard implements IGameElement {
 
     private static final String TAG = "GameBoard";
 
-    private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-    private final FirebaseStorage mStorage = FirebaseStorage.getInstance();
+    private FirebaseDatabase mDatabase;
+    private FirebaseStorage mStorage;
 
     private String mGameId;
 
@@ -39,10 +39,15 @@ public class GameBoard implements IGameElement {
     GameBoard(String gameId) {
         mGameId = gameId;
         initialized = false;
+    }
+
+    void init() {
+        mDatabase = FirebaseDatabase.getInstance();
+        mStorage = FirebaseStorage.getInstance();
         getFirebaseData();
     }
 
-    //Get data from Firebase and call init() once we have it
+    //Get data from Firebase and call finishInit() once we have it
     private void getFirebaseData(){
         Log.d(TAG, "getGameBoard: " + mGameId);
         mDatabase.getReference("gameBuilder/gameSpecs").child(mGameId).child("board")
@@ -72,7 +77,7 @@ public class GameBoard implements IGameElement {
                                 public void onSuccess(byte[] bytes) {
                                     Log.d(TAG, "Image read success");
                                     Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                    init(image, backgroundColor, maxScale);
+                                    finishInit(image, backgroundColor, maxScale);
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -97,9 +102,9 @@ public class GameBoard implements IGameElement {
     }
 
     //Set the data and set the initialized flag to show we can start drawing
-    private void init(Bitmap image, String backgroundColor, long maxScale){
+    private void finishInit(Bitmap image, String backgroundColor, long maxScale){
         //get actual image using id
-        Log.d(TAG, "init");
+        Log.d(TAG, "finishInit");
         this.image = image;
         this.backgroundColor = backgroundColor;
         this.maxScale = maxScale;
@@ -122,4 +127,7 @@ public class GameBoard implements IGameElement {
         // draw shit
     }
 
+    String getGameId() {
+        return mGameId;
+    }
 }

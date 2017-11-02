@@ -74,7 +74,7 @@ public class GamePiece implements IGameElement {
 
     void startInit(DataSnapshot dataSnapshot){
         mDatabase = FirebaseDatabase.getInstance();
-       mStorage = FirebaseStorage.getInstance();
+        mStorage = FirebaseStorage.getInstance();
         pieceElementId = dataSnapshot.child("pieceElementId").getValue().toString();
         deckPieceIndex = (Long) dataSnapshot.child("deckPieceIndex").getValue();
         initialState = dataSnapshot.child("initialState").getValue(PieceState.class);

@@ -20,15 +20,23 @@ import static org.hamcrest.MatcherAssert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GameTest {
-    
-    @Before
-    public void setUp(){
-
-    }
 
     @Test
     public void testCreateGame(){
+        Game game = new Game("gameid", "matchid", "groupid");
+        assertThat(game.getGameId(), is("gameid"));
+        assertThat(game.getBoard().getGameId(), is("gameid"));
+        assertThat(game.getPieces().getGameId(), is("gameid"));
+        assertThat(game.getPieces().size(), is(0));
+    }
 
+    @Test
+    public void testCreateGamePieces(){
+        GamePieces pieces = new GamePieces("gameid", "matchid", "groupid");
+        assertThat(pieces.getGameId(), is("gameid"));
+        assertThat(pieces.size(), is(0));
+        pieces.add(new GamePiece("gameid", "matchid", "groupid"));
+        assertThat(pieces.size(), is(1));
     }
 
     @Test
@@ -46,7 +54,8 @@ public class GameTest {
     }
 
     @Test
-    public void testGetPieces(){
-
+    public void testCreateGameBoard(){
+        GameBoard board = new GameBoard("gameid");
+        assertThat(board.getGameId(), is("gameid"));
     }
 }
