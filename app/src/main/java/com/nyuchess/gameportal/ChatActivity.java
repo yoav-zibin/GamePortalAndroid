@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -41,8 +42,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         chatID = getIntent().getStringExtra("GROUP_ID");
 
-        FloatingActionButton fab =
-                (FloatingActionButton)findViewById(R.id.fab);
+        Button fab = (Button) findViewById(R.id.fab);
 
         Log.d(TAG, FirebaseDatabase.getInstance().getReference("gamePortal/groups/" + chatID + "/messages").toString());
 
@@ -68,8 +68,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         displayChatMessages();
-
-        findViewById(R.id.addPpl).setOnClickListener(this);
     }
 
     private void displayChatMessages() {
@@ -117,10 +115,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         int i = view.getId();
-        if(i == R.id.addPpl) {
-            Intent intent = new Intent(this, UsersActivity.class);
-            startActivityForResult(intent, ADD_PEOPLE);
-        }
     }
 
     @Override

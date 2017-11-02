@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Group Name"
+        android:hint="Group Name"
         tools:layout_editor_absoluteX="153dp"
         tools:layout_editor_absoluteY="452dp"
         android:layout_alignBottom="@+id/newChat"

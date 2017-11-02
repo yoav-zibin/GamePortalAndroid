@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -55,13 +56,24 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
                 mChatsAdapter.clear();
                 Log.d(TAG, "onDataChange");
                 for(DataSnapshot chat: dataSnapshot.getChildren()) {
+                    Log.d(TAG, chat.getKey());
                     DatabaseReference ref2 = mDatabase.getReference("gamePortal/groups/" + chat.getKey());
                     ref2.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot group) {
                             Log.d(TAG, group.child("groupName").toString());
                             Log.d(TAG, group.getKey());
-                            mChatsAdapter.add(new GameArrayItem(group.child("groupName").getValue().toString(), group.getKey()));
+                            GameArrayItem inGroup = new GameArrayItem(group.child("groupName").getValue().toString(), group.getKey());
+                            boolean found = false;
+                            for(int i = 0; i < mChatsAdapter.getCount(); i++) {
+                                if(mChatsAdapter.getItem(i).getGameName().equals(inGroup.getGameName())
+                                        && mChatsAdapter.getItem(i).getId().equals(inGroup.getId())) {
+                                    found = true;
+                                }
+                            }
+                            if(!found) {
+                                mChatsAdapter.add(inGroup);
+                            }
                         }
 
                         @Override
@@ -97,32 +109,42 @@ public class ChatsListActivity extends AppCompatActivity implements View.OnClick
         int i = v.getId();
         if(i == R.id.newChat) {
             //Add to global chat
-            DatabaseReference chats = mDatabase.getReference("/gamePortal/groups");
 
-            Map<String, Object> index = new HashMap<>();
-            index.put("participantIndex", 0);
+            EditText groupEditText = (EditText) findViewById(R.id.chatName);
+            String groupName = groupEditText.getText().toString();
+            if (groupName.matches("")) {
+                Toast.makeText(this, "You did not enter a group name", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
 
-            Map<String, Object> inChat = new HashMap<>();
-            inChat.put(mAuth.getCurrentUser().getUid(), index);
+                DatabaseReference chats = mDatabase.getReference("/gamePortal/groups");
 
-            EditText edit = (EditText)findViewById(R.id.chatName);
-            String name = edit.getText().toString(); //gets you the contents of edit text
+                Map<String, Object> index = new HashMap<>();
+                index.put("participantIndex", 0);
 
-            Map<String, Object> chat = new HashMap<>();
-            chat.put("participants", inChat);
-            chat.put("groupName", name);
-            chat.put("createdOn", ServerValue.TIMESTAMP);
+                Map<String, Object> inChat = new HashMap<>();
+                inChat.put(mAuth.getCurrentUser().getUid(), index);
 
-            String push = chats.push().toString().replace(chats.getRef().toString() + "/", "");
-            chats.child(push).setValue(chat);
-            mChatsAdapter.add(new GameArrayItem(name, push));
+                EditText edit = (EditText) findViewById(R.id.chatName);
+                String name = edit.getText().toString(); //gets you the contents of edit text
 
-            DatabaseReference pba = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid());
-            Map<String, Object> chatInfo = new HashMap<>();
-            chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
-            chatInfo.put("timestamp", ServerValue.TIMESTAMP);
+                Map<String, Object> chat = new HashMap<>();
+                chat.put("participants", inChat);
+                chat.put("groupName", name);
+                chat.put("createdOn", ServerValue.TIMESTAMP);
 
-            pba.child("privateButAddable").child("groups").child(push).setValue(chatInfo);
+                String push = chats.push().toString().replace(chats.getRef().toString() + "/", "");
+                chats.child(push).setValue(chat);
+                mChatsAdapter.add(new GameArrayItem(name, push));
+
+                DatabaseReference pba = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid());
+                Map<String, Object> chatInfo = new HashMap<>();
+                chatInfo.put("addedByUid", mAuth.getCurrentUser().getUid());
+                chatInfo.put("timestamp", ServerValue.TIMESTAMP);
+
+                pba.child("privateButAddable").child("groups").child(push).setValue(chatInfo);
+                groupEditText.setText("");
+            }
         }
     }
 }

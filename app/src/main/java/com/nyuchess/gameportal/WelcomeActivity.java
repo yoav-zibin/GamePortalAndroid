@@ -61,9 +61,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         UID = mAuth.getCurrentUser().getUid();
 
-        Toast.makeText(WelcomeActivity.this, UID,
-                Toast.LENGTH_SHORT).show();
-
         DatabaseReference ref = database.getReference("/users");
 
         Map<String, Object> pub = new HashMap<>();
@@ -185,7 +182,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + mOnlineViewerCount);
                 for (DataSnapshot user: dataSnapshot.getChildren()) {
                     final String userid = (String) user.child("userId").getValue();
-                    if(userid != UID) {
+                    if(!userid.equals(UID)) {
+                        Log.d(TAG, UID + " " + userid);
                         DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
                         isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override

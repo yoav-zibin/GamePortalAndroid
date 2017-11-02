@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,6 +26,8 @@ public class UsersActivity extends AppCompatActivity {
     private UserArrayAdapter mOnlineAdapter;
     private UserArrayAdapter mOfflineAdapter;
 
+    private FirebaseAuth mAuth;
+
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
     @Override
@@ -33,6 +36,7 @@ public class UsersActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_users);
 
+        mAuth = FirebaseAuth.getInstance();
         List<User> onlineUsers = new ArrayList<>();
         final List<User> offlineUsers = new ArrayList<>();
         mOnlineAdapter = new UserArrayAdapter(this, onlineUsers);
@@ -84,37 +88,38 @@ public class UsersActivity extends AppCompatActivity {
         mOnlineAdapter.clear();
         mOfflineAdapter.clear();
         Log.d(TAG, dataSnapshot.getKey());
-        for (DataSnapshot user: dataSnapshot.getChildren()){
+        for (DataSnapshot user: dataSnapshot.getChildren()) {
             final String userid = (String) user.child("userId").getValue();
-            DatabaseReference userRef = mDatabase.getReference("/users/" + userid + "/publicFields/");
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child("displayName").getValue() == null){
-                        return;
+            if (!userid.equals(mAuth.getCurrentUser().getUid())) {
+                DatabaseReference userRef = mDatabase.getReference("/users/" + userid + "/publicFields/");
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child("displayName").getValue() == null) {
+                            return;
+                        }
+                        String username = (String) dataSnapshot.child("displayName").getValue();
+                        Object isConnectedValue = dataSnapshot.child("isConnected").getValue();
+                        Log.d(TAG, username + " " + isConnectedValue);
+                        if (isConnectedValue == null) {
+                            return;
+                        }
+                        boolean isConnected = (boolean) isConnectedValue;
+                        if (isConnected) {
+                            Log.d(TAG, username + " online");
+                            mOnlineAdapter.add(new User(username, userid));
+                        } else {
+                            Log.d(TAG, username + " offline");
+                            mOfflineAdapter.add(new User(username, userid));
+                        }
                     }
-                    String username = (String) dataSnapshot.child("displayName").getValue();
-                    Object isConnectedValue = dataSnapshot.child("isConnected").getValue();
-                    Log.d(TAG, username + " " + isConnectedValue);
-                    if (isConnectedValue == null){
-                        return;
-                    }
-                    boolean isConnected = (boolean) isConnectedValue;
-                    if (isConnected){
-                        Log.d(TAG, username + " online");
-                        mOnlineAdapter.add(new User(username, userid));
-                    }
-                    else{
-                        Log.d(TAG, username + " offline");
-                        mOfflineAdapter.add(new User(username, userid));
-                    }
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d(TAG, "DatabaseError:" + databaseError);
-                }
-            });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "DatabaseError:" + databaseError);
+                    }
+                });
+            }
         }
     }
 }
