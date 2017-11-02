@@ -10,17 +10,21 @@
         android:id="@+id/welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        />
+        android:layout_marginTop="10dp"
+        android:text="Welcome" />
 
     <Button
         android:id="@+id/sign_out"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="125dp"
+        android:layout_height="70dp"
+        android:layout_below="@+id/welcome"
         android:layout_centerHorizontal="true"
-        android:text="SIGN OUT"
-        android:layout_below="@id/welcome"/>
+        android:layout_marginTop="13dp"
+        android:background="#7aa0c2"
+        android:textSize="15sp"
+        android:text="SIGN OUT" />
 
     <!--<Button-->
     <!--android:id="@+id/view_online_users"-->
@@ -32,39 +36,46 @@
     <!--android:onClick="viewOnlineUsers"/>-->
 
     <TextView
-        android:id ="@+id/users_online"
+        android:id="@+id/users_online"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Users online:"
-        android:layout_below="@id/sign_out"
-        android:layout_centerHorizontal="true"/>
+        android:layout_below="@+id/sign_out"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="Users online:" />
 
     <Button
         android:id="@+id/group_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:background="#90cc8e"
+        android:layout_alignLeft="@+id/start_match"
+        android:layout_alignStart="@+id/start_match"
         android:layout_below="@+id/users_online"
-        android:layout_marginTop="38dp"
-        android:layout_toLeftOf="@+id/sign_out"
-        android:layout_toStartOf="@+id/sign_out"
+        android:layout_marginTop="15dp"
+        android:textSize="20sp"
         android:text="Groups" />
 
     <Button
         android:id="@+id/people_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/group_button"
-        android:layout_toEndOf="@+id/sign_out"
-        android:layout_toRightOf="@+id/sign_out"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:background="#90cc8e"
+        android:layout_above="@+id/start_match"
+        android:layout_alignEnd="@+id/start_match"
+        android:layout_alignRight="@+id/start_match"
+        android:textSize="20sp"
         android:text="Users" />
 
     <Button
         android:id="@+id/start_match"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="350dp"
+        android:layout_height="150dp"
+        android:background="#FF5733"
         android:layout_below="@+id/group_button"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="74dp"
+        android:layout_marginTop="42dp"
+        android:textSize="30sp"
         android:text="Start A Match" />
 
 

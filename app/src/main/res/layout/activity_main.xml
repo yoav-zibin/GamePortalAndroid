@@ -13,66 +13,89 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/login_text"
         android:textSize="50sp"/>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+
+    <Button
+        android:id="@+id/email_sign_in_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/twitter_sign_in_button"
+        android:layout_alignStart="@+id/twitter_sign_in_button"
+        android:layout_alignTop="@+id/phone_sign_in_button"
+        android:layout_weight="1"
+        android:background="#d2ebd1"
+        android:onClick="doEmailLogin"
+        android:text="@string/fa_icon_email"
+        android:textColor="#81c784"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/phone_sign_in_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/facebook_sign_in_button"
+        android:layout_alignStart="@+id/facebook_sign_in_button"
         android:layout_below="@+id/login_text"
+        android:layout_marginTop="10dp"
+        android:background="#dad1eb"
+        android:layout_weight="1"
+        android:onClick="doPhoneLogin"
+        android:text="@string/fa_icon_phone"
+        android:textColor="#9b59b6"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/facebook_sign_in_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/phone_sign_in_button"
+        android:layout_marginTop="11dp"
+        android:layout_toEndOf="@+id/gplus_sign_in_button"
+        android:layout_toRightOf="@+id/gplus_sign_in_button"
+        android:layout_weight="1"
+        android:background="#d1e0ea"
+        android:onClick="doFacebookLogin"
+        android:text="@string/fa_icon_facebook"
+        android:textColor="#3b5998"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/twitter_sign_in_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignTop="@+id/facebook_sign_in_button"
+        android:layout_toLeftOf="@+id/gplus_sign_in_button"
+        android:layout_toStartOf="@+id/gplus_sign_in_button"
+        android:layout_weight="1"
+        android:background="#d1ebea"
+        android:onClick="doTwitterLogin"
+        android:text="@string/fa_icon_twitter"
+        android:textColor="#0084b4"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/gplus_sign_in_button"
+        android:background="#ead5d1"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/twitter_sign_in_button"
         android:layout_centerHorizontal="true"
-        android:id="@+id/login_buttons">
-        <Button
-            android:id="@+id/email_sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/fa_icon_email"
-            android:textSize="30sp"
-            android:textColor="#81c784"
-            android:onClick="doEmailLogin"/>
-        <Button
-            android:id="@+id/phone_sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/fa_icon_phone"
-            android:textSize="30sp"
-            android:textColor="#9b59b6"
-            android:onClick="doPhoneLogin"/>
-        <Button
-            android:id="@+id/facebook_sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/fa_icon_facebook"
-            android:textSize="30sp"
-            android:textColor="#3b5998"
-            android:onClick="doFacebookLogin"/>
-        <Button
-            android:id="@+id/twitter_sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/fa_icon_twitter"
-            android:textSize="30sp"
-            android:textColor="#0084b4"
-            android:onClick="doTwitterLogin"/>
-        <Button
-            android:id="@+id/gplus_sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/fa_icon_gplus"
-            android:textSize="30sp"
-            android:textColor="#d34836"
-            android:onClick="doGooglePlusLogin"/>
-    </LinearLayout>
+        android:layout_marginTop="17dp"
+        android:layout_weight="1"
+        android:onClick="doGooglePlusLogin"
+        android:text="@string/fa_icon_gplus"
+        android:textColor="#d34836"
+        android:textSize="30sp" />
+
     <Button
         android:id="@+id/anon_sign_in_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/login_buttons"
+        android:layout_height="150dp"
+        android:background="#d9d9d9"
+        android:layout_below="@+id/gplus_sign_in_button"
         android:layout_centerHorizontal="true"
-        android:text="Anonymous"
-        android:onClick="doAnonymousLogin"/>
+        android:layout_marginTop="16dp"
+        android:onClick="doAnonymousLogin"
+        android:text="Anonymous" />
 
 
 </RelativeLayout>

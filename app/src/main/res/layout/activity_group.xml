@@ -18,28 +18,36 @@
 
     <Button
         android:id="@+id/chat_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="54dp"
-        android:text="Chat"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/addPpl"
-        android:layout_toStartOf="@+id/addPpl" />
+        android:layout_marginLeft="28dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="42dp"
+        android:textSize="20sp"
+        android:background="#90cc8e"
+        android:text="Chat" />
 
     <Button
         android:id="@+id/matches_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Matches"
-        android:layout_alignBaseline="@+id/chat_button"
-        android:layout_alignBottom="@+id/chat_button"
-        android:layout_toRightOf="@+id/addPpl"
-        android:layout_toEndOf="@+id/addPpl" />
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_alignTop="@+id/chat_button"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="28dp"
+        android:layout_marginRight="28dp"
+        android:textSize="20sp"
+        android:background="#90cc8e"
+        android:text="Matches" />
 
     <Button
         android:id="@+id/addPpl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="#FF5733"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="55dp"
