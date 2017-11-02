@@ -113,9 +113,10 @@ public class GooglePlusLoginActivity extends AppCompatActivity implements
     }
 
     private void updateUI(FirebaseUser user) {
-        if(user != null) {
+        if (user != null) {
             Log.d(TAG, "Swapping Screen");
             Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
+            intent.putExtra("PROVIDER", "GOOGLE");
             startActivity(intent);
         }
     }

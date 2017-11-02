@@ -185,25 +185,27 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + mOnlineViewerCount);
                 for (DataSnapshot user: dataSnapshot.getChildren()) {
                     final String userid = (String) user.child("userId").getValue();
-                    DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
-                    isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.child("isConnected").getValue() != null) {
-                                Log.d(TAG, dataSnapshot.child("isConnected").getValue().toString());
-                                if(dataSnapshot.child("isConnected").getValue().toString().equals("true")) {
-                                    addPeople();
-                                    Log.d(TAG, "adding " + mOnlineViewerCount + " " + userid);
-                                    mOnlineViewerCountTextView.setText("Users Online: " + mOnlineViewerCount);
+                    if(userid != UID) {
+                        DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
+                        isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.child("isConnected").getValue() != null) {
+                                    Log.d(TAG, dataSnapshot.child("isConnected").getValue().toString());
+                                    if (dataSnapshot.child("isConnected").getValue().toString().equals("true")) {
+                                        addPeople();
+                                        Log.d(TAG, "adding " + mOnlineViewerCount + " " + userid);
+                                        mOnlineViewerCountTextView.setText("Users Online: " + mOnlineViewerCount);
+                                    }
                                 }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError error) {
+                            @Override
+                            public void onCancelled(DatabaseError error) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
             }
 
