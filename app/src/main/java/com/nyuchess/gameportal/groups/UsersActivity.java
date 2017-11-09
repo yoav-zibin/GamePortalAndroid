@@ -258,7 +258,8 @@ public class UsersActivity extends AppCompatActivity {
                                     if (isConnectedValue == null) {
                                         return;
                                     }
-                                    if(!groupiesf.contains(userid)) {
+                                    boolean should = (getIntent().getStringExtra("seePpl") == null ? !groupiesf.contains(userid) : groupiesf.contains(userid));
+                                    if(should) {
                                         boolean isConnected = (boolean) isConnectedValue;
                                         if (isConnected) {
                                             Log.d(TAG, username + " online");

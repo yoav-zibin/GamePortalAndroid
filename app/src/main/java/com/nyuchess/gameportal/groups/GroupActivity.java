@@ -35,6 +35,7 @@ public class GroupActivity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.chat_button).setOnClickListener(this);
         findViewById(R.id.matches_button).setOnClickListener(this);
         findViewById(R.id.addPpl).setOnClickListener(this);
+        findViewById(R.id.seePpl).setOnClickListener(this);
     }
 
     @Override
@@ -53,6 +54,11 @@ public class GroupActivity extends AppCompatActivity implements View.OnClickList
         } else if(i == R.id.addPpl) {
             Intent intent = new Intent(this, UsersActivity.class);
             intent.putExtra("GROUP_ID", GROUP_ID);
+            startActivityForResult(intent, ADD_PEOPLE);
+        } else if(i == R.id.seePpl) {
+            Intent intent = new Intent(this, UsersActivity.class);
+            intent.putExtra("GROUP_ID", GROUP_ID);
+            intent.putExtra("seePpl", GROUP_ID);
             startActivityForResult(intent, ADD_PEOPLE);
         }
     }

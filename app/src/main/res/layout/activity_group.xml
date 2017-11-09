@@ -52,4 +52,14 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="55dp"
         android:text="Add People" />
+
+    <Button
+        android:id="@+id/seePpl"
+        android:layout_width="125dp"
+        android:layout_height="75dp"
+        android:layout_below="@+id/chat_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="41dp"
+        android:background="#7aa0c2"
+        android:text="See Groupies" />
 </RelativeLayout>
