@@ -52,6 +52,7 @@ public class GroupActivity extends AppCompatActivity implements View.OnClickList
 //            intent.putExtra("GAME_ID", "-Kx61wq6VG5K5NNxbF5L");
         } else if(i == R.id.addPpl) {
             Intent intent = new Intent(this, UsersActivity.class);
+            intent.putExtra("GROUP_ID", GROUP_ID);
             startActivityForResult(intent, ADD_PEOPLE);
         }
     }

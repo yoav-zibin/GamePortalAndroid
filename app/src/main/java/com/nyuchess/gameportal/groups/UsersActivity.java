@@ -53,18 +53,50 @@ public class UsersActivity extends AppCompatActivity {
         onlineUsersList.setAdapter(mOnlineAdapter);
         offlineUsersList.setAdapter(mOfflineAdapter);
 
-        DatabaseReference ref = mDatabase.getReference("gamePortal/recentlyConnected");
-        Log.d(TAG, "users ref " + ref.toString());
-        ref.addValueEventListener(new ValueEventListener() {
+        final DatabaseReference databaseReference = mDatabase.getReference();
+        final DatabaseReference onlineViewersCountRef = databaseReference.child("/gamePortal/recentlyConnected");
+        onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
+            private ArrayList<String> online;
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange");
-                updateUserLists(dataSnapshot);
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                online = new ArrayList<>();
+                Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount());
+                final DataSnapshot snap = dataSnapshot;
+                for (final DataSnapshot user: dataSnapshot.getChildren()) {
+                    final String userid = (String) user.child("userId").getValue();
+                    if(!userid.equals(mAuth.getCurrentUser().getUid())) {
+                        DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
+                        isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.child("isConnected").getValue() != null) {
+                                    dataSnapshot.child("isConnected").getRef().addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Log.d(TAG, dataSnapshot.toString());
+                                            updateUserLists(snap);
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
+            public void onCancelled(final DatabaseError databaseError) {
+                Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
 
@@ -124,11 +156,6 @@ public class UsersActivity extends AppCompatActivity {
 
         final String GROUP_ID = groups.push().toString().replace(groups.getRef().toString() + "/", "");
         groups.child(GROUP_ID).setValue(chat);
-
-        Log.d(TAG, "SETTING VALUE");
-        Log.d(TAG, "SETTING VALUE");
-        Log.d(TAG, "SETTING VALUE");
-        Log.d(TAG, "SETTING VALUE");
 
         DatabaseReference pba = mDatabase.getReference("/users/" + mAuth.getCurrentUser().getUid());
         Map<String, Object> chatInfo = new HashMap<>();
@@ -195,62 +222,143 @@ public class UsersActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUserLists(DataSnapshot dataSnapshot){
+    private void updateUserLists(final DataSnapshot dataSnapshot){
         // When the list of online users in the database changes, remake the list adapter here
 
-        Log.d(TAG, "updateUserLists");
-        mOnlineAdapter.clear();
-        mOfflineAdapter.clear();
-        Log.d(TAG, dataSnapshot.getKey());
-        for (DataSnapshot user: dataSnapshot.getChildren()) {
-            final String userid = (String) user.child("userId").getValue();
-            if (!userid.equals(mAuth.getCurrentUser().getUid())) {
-                DatabaseReference userRef = mDatabase.getReference("/users/" + userid + "/publicFields/");
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child("displayName").getValue() == null) {
-                            return;
-                        }
-                        String username = (String) dataSnapshot.child("displayName").getValue();
-                        Object isConnectedValue = dataSnapshot.child("isConnected").getValue();
-                        Log.d(TAG, username + " " + isConnectedValue);
-                        if (isConnectedValue == null) {
-                            return;
-                        }
-                        boolean isConnected = (boolean) isConnectedValue;
-                        if (isConnected) {
-                            Log.d(TAG, username + " online");
-                            User user = new User(username, userid);
-                            boolean found = false;
-                            for(int i = 0; i < mOnlineAdapter.getCount(); i++) {
-                                if(mOnlineAdapter.getItem(i).getUid().equals(user.getUid())) {
-                                    found = true;
-                                }
-                            }
-                            if(!found) {
-                                mOnlineAdapter.add(user);
-                            }
-                        } else {
-                            Log.d(TAG, username + " offline");
-                            User user = new User(username, userid);
-                            boolean found = false;
-                            for(int i = 0; i < mOfflineAdapter.getCount(); i++) {
-                                if(mOfflineAdapter.getItem(i).getUid().equals(user.getUid())) {
-                                    found = true;
-                                }
-                            }
-                            if(!found) {
-                                mOfflineAdapter.add(user);
-                            }
-                        }
+        String group = null;
+        if(getIntent().getStringExtra("GROUP_ID") != null) {
+            group = getIntent().getStringExtra("GROUP_ID");
+            DatabaseReference ref = mDatabase.getReference("/gamePortal/groups/" + group + "/participants");
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot groupSnap) {
+                    ArrayList<String> groupies = new ArrayList<>();
+                    for(DataSnapshot user : groupSnap.getChildren()) {
+                        groupies.add(user.getKey());
                     }
+                    Log.d(TAG, groupies.size() + "");
+                    Log.d(TAG, "updateUserLists");
+                    mOnlineAdapter.clear();
+                    mOfflineAdapter.clear();
+                    final ArrayList<String> groupiesf = groupies;
+                    final DataSnapshot snapshot = dataSnapshot;
+                    for (DataSnapshot user : dataSnapshot.getChildren()) {
+                        final String userid = (String) user.child("userId").getValue();
+                        if (!userid.equals(mAuth.getCurrentUser().getUid())) {
+                            DatabaseReference userRef = mDatabase.getReference("/users/" + userid + "/publicFields/");
+                            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.child("displayName").getValue() == null) {
+                                        return;
+                                    }
+                                    String username = (String) dataSnapshot.child("displayName").getValue();
+                                    Object isConnectedValue = dataSnapshot.child("isConnected").getValue();
+                                    Log.d(TAG, username + " " + isConnectedValue);
+                                    if (isConnectedValue == null) {
+                                        return;
+                                    }
+                                    if(!groupiesf.contains(userid)) {
+                                        boolean isConnected = (boolean) isConnectedValue;
+                                        if (isConnected) {
+                                            Log.d(TAG, username + " online");
+                                            User user = new User(username, userid);
+                                            boolean found = false;
+                                            for (int i = 0; i < mOnlineAdapter.getCount(); i++) {
+                                                if (mOnlineAdapter.getItem(i).getUid().equals(user.getUid())) {
+                                                    found = true;
+                                                }
+                                            }
+                                            if (!found) {
+                                                mOnlineAdapter.add(user);
+                                            }
+                                        } else {
+                                            Log.d(TAG, username + " offline");
+                                            User user = new User(username, userid);
+                                            boolean found = false;
+                                            for (int i = 0; i < mOfflineAdapter.getCount(); i++) {
+                                                if (mOfflineAdapter.getItem(i).getUid().equals(user.getUid())) {
+                                                    found = true;
+                                                }
+                                            }
+                                            if (!found) {
+                                                mOfflineAdapter.add(user);
+                                            }
+                                        }
+                                    }
+                                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "DatabaseError:" + databaseError);
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.d(TAG, "DatabaseError:" + databaseError);
+                                }
+                            });
+                        }
                     }
-                });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+        } else {
+
+            Log.d(TAG, "updateUserLists");
+            mOnlineAdapter.clear();
+            mOfflineAdapter.clear();
+            Log.d(TAG, dataSnapshot.getKey());
+            for (DataSnapshot user : dataSnapshot.getChildren()) {
+                final String userid = (String) user.child("userId").getValue();
+                if (!userid.equals(mAuth.getCurrentUser().getUid())) {
+                    DatabaseReference userRef = mDatabase.getReference("/users/" + userid + "/publicFields/");
+                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child("displayName").getValue() == null) {
+                                return;
+                            }
+                            String username = (String) dataSnapshot.child("displayName").getValue();
+                            Object isConnectedValue = dataSnapshot.child("isConnected").getValue();
+                            Log.d(TAG, username + " " + isConnectedValue);
+                            if (isConnectedValue == null) {
+                                return;
+                            }
+                            boolean isConnected = (boolean) isConnectedValue;
+                            if (isConnected) {
+                                Log.d(TAG, username + " online");
+                                User user = new User(username, userid);
+                                boolean found = false;
+                                for (int i = 0; i < mOnlineAdapter.getCount(); i++) {
+                                    if (mOnlineAdapter.getItem(i).getUid().equals(user.getUid())) {
+                                        found = true;
+                                    }
+                                }
+                                if (!found) {
+                                    mOnlineAdapter.add(user);
+                                }
+                            } else {
+                                Log.d(TAG, username + " offline");
+                                User user = new User(username, userid);
+                                boolean found = false;
+                                for (int i = 0; i < mOfflineAdapter.getCount(); i++) {
+                                    if (mOfflineAdapter.getItem(i).getUid().equals(user.getUid())) {
+                                        found = true;
+                                    }
+                                }
+                                if (!found) {
+                                    mOfflineAdapter.add(user);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d(TAG, "DatabaseError:" + databaseError);
+                        }
+                    });
+                }
             }
         }
     }

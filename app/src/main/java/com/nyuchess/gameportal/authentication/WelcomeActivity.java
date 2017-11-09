@@ -182,6 +182,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "DatabaseError:" + databaseError);
             }
         });
+
         final DatabaseReference onlineViewersCountRef = databaseReference.child("/gamePortal/recentlyConnected");
         onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
             private ArrayList<String> online;
@@ -199,12 +200,18 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.child("isConnected").getValue() != null) {
                                     Log.d(TAG, dataSnapshot.child("isConnected").getValue().toString());
-                                    if (dataSnapshot.child("isConnected").getValue().toString().equals("true")) {
-                                        if(!online.contains(userid)) {
-                                            online.add(userid);
+                                    dataSnapshot.child("isConnected").getRef().addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Log.d(TAG, dataSnapshot.toString());
+                                            addPeople();
                                         }
-                                        mOnlineViewerCountTextView.setText("Users Online: " + online.size());
-                                    }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
                             }
 
@@ -232,6 +239,48 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void addPeople() {
-        mOnlineViewerCount++;
+        final DatabaseReference databaseReference = database.getReference();
+        final DatabaseReference onlineViewersCountRef = databaseReference.child("/gamePortal/recentlyConnected");
+        onlineViewersCountRef.addValueEventListener(new ValueEventListener() {
+            private ArrayList<String> online;
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                online = new ArrayList<>();
+                Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + mOnlineViewerCount);
+                for (final DataSnapshot user: dataSnapshot.getChildren()) {
+                    final String userid = (String) user.child("userId").getValue();
+                    if(!userid.equals(UID)) {
+                        Log.d(TAG, UID + " " + userid);
+                        DatabaseReference isOnlineRef = databaseReference.child("/users/" + userid + "/publicFields");
+                        isOnlineRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.child("isConnected").getValue() != null) {
+                                    Log.d(TAG, dataSnapshot.child("isConnected").getValue().toString());
+
+                                    if (dataSnapshot.child("isConnected").getValue().toString().equals("true")) {
+                                        if(!online.contains(userid)) {
+                                            online.add(userid);
+                                        }
+                                        mOnlineViewerCountTextView.setText("Users Online: " + online.size());
+                                        Log.d(TAG, ""+ online.size());
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(final DatabaseError databaseError) {
+                Log.d(TAG, "DatabaseError:" + databaseError);
+            }
+        });
     }
 }
