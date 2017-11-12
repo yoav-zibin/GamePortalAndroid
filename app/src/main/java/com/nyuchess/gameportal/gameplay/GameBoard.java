@@ -34,6 +34,9 @@ public class GameBoard implements IGameElement {
 
     private Bitmap image;
 
+    private int mHeight;
+    private int mWidth;
+
     private boolean initialized;
 
     GameBoard(String gameId) {
@@ -106,6 +109,8 @@ public class GameBoard implements IGameElement {
         //get actual image using id
         Log.d(TAG, "finishInit");
         this.image = image;
+        this.mHeight = image.getHeight();
+        this.mWidth = image.getWidth();
         this.backgroundColor = backgroundColor;
         this.maxScale = maxScale;
 //        Log.d(TAG, "imageId: " + imageId);
@@ -129,5 +134,13 @@ public class GameBoard implements IGameElement {
 
     String getGameId() {
         return mGameId;
+    }
+
+    int getHeight(){
+        return mHeight;
+    }
+
+    int getWidth(){
+        return mWidth;
     }
 }

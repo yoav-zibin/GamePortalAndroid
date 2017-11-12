@@ -57,4 +57,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
     }
+
+    @Override
+    public boolean performClick(){
+        return super.performClick();
+    }
 }
