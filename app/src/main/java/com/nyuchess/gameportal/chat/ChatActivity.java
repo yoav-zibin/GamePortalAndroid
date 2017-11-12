@@ -3,7 +3,7 @@ package com.nyuchess.gameportal.chat;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -88,8 +88,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 setMessageUsername(messageUser, model.getSenderUid());
 
                 // Format the date before showing it
-                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
-                        model.getTimestamp()));
+                messageTime.setText(DateUtils.getRelativeDateTimeString(getBaseContext(),
+                        model.getTimestamp(), DateUtils.MINUTE_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, 0));
             }
 
             private void setMessageUsername(final TextView v, final String uid){
