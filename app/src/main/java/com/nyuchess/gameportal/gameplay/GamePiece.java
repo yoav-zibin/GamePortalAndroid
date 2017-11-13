@@ -35,12 +35,14 @@ public class GamePiece implements IGameElement {
     private String pieceElementId;
 
     private PieceState initialState;
+    //for keeping track of a piece's state while it's being changed but before it's finalized
+    //and sent to Firebase
+    private PieceState previousState;
     private PieceState currentState;
 
     private long deckPieceIndex;
     private List<Bitmap> images;
     private String pieceIndex;
-    private int currentImageIndex;
     private int mHeight;
     private int mWidth;
     private String mGroupId;
@@ -79,7 +81,7 @@ public class GamePiece implements IGameElement {
         deckPieceIndex = (Long) dataSnapshot.child("deckPieceIndex").getValue();
         initialState = dataSnapshot.child("initialState").getValue(PieceState.class);
         Log.d(TAG, "initial state: " + initialState);
-        currentState = initialState;
+        currentState = previousState = initialState;
         this.pieceIndex = dataSnapshot.getKey();
         mDatabase.getReference("gameBuilder/gameSpecs").child(mGameId).child("board")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -115,9 +117,6 @@ public class GamePiece implements IGameElement {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        final int height = dataSnapshot.child("height").getValue(Integer.class);
-                        final int width = dataSnapshot.child("width").getValue(Integer.class);
-                        Log.d(TAG, "Height x Width: " + height + " x " + width);
                         Log.d(TAG, "Got data snapshot for piece element " + pieceElementId);
                         //now get the actual images
                         final int imageCount = (int) dataSnapshot.child("images").getChildrenCount();
@@ -141,7 +140,7 @@ public class GamePiece implements IGameElement {
                                             Log.d(TAG, "got " + images.size() + " images");
                                             //check to see if all images have been gotten before initializing
                                             if (images.size() == imageCount) {
-                                                finishInit(images, height, width);
+                                                finishInit(images);
                                             }
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
@@ -168,11 +167,12 @@ public class GamePiece implements IGameElement {
 
     }
 
-    private void finishInit(List<Bitmap> images, int height, int width){
+    private void finishInit(List<Bitmap> images){
         Log.d(TAG, "initializing");
         this.images = images;
-        this.mHeight = height;
-        this.mWidth = width;
+        mHeight = images.get(0).getHeight();
+        mWidth = images.get(0).getWidth();
+        Log.d(TAG, "Height x Width: " + mHeight + " x " + mWidth);
 
         //add listener for changing state
         FirebaseDatabase.getInstance().getReference(
@@ -185,10 +185,9 @@ public class GamePiece implements IGameElement {
                                 .child("x").getValue().toString())) / 100 * widthScreen);
                         int y = (int)((Float.parseFloat(dataSnapshot.child("currentState")
                                 .child("y").getValue().toString())) / 100 * heightScreen);
-                        int zDepth = (int)((Float.parseFloat(dataSnapshot.child("currentState")
-                                .child("zDepth").getValue().toString())) / 100 * heightScreen);
-                        int currentImageIndex = (int)((Float.parseFloat(dataSnapshot.child("currentState")
-                                .child("currentImageIndex").getValue().toString())) / 100 * heightScreen);
+                        int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
+                        int currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
+                        updatePreviousState();
                         currentState.update(x, y, zDepth, currentImageIndex);
                     }
 
@@ -201,6 +200,12 @@ public class GamePiece implements IGameElement {
         initialized = true;
     }
 
+    int getNextImageIndex(){
+        int next = (currentState.currentImageIndex + 1) % images.size();
+        Log.d(TAG, "Next image is " + (next + 1) + "/" + images.size());
+        return (currentState.currentImageIndex + 1) % images.size();
+    }
+
     @Override
     public void draw(Canvas canvas) {
         if (!initialized){
@@ -208,7 +213,8 @@ public class GamePiece implements IGameElement {
             return;
         }
         Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());
-        canvas.drawBitmap(images.get(currentImageIndex), currentState.getX(), currentState.getY(), null);
+        canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()),
+                currentState.getX(), currentState.getY(), null);
     }
 
     public String getGroupId() {
@@ -228,6 +234,14 @@ public class GamePiece implements IGameElement {
     public void setInitialState(PieceState state) { this.initialState = state; }
 
     public PieceState getCurrentState() { return currentState; }
+
+    PieceState getPreviousState() {
+        return previousState;
+    }
+
+    void updatePreviousState(){
+        previousState.update(currentState.x, currentState.y, currentState.zDepth, currentState.currentImageIndex);
+    }
 
     public int getHeight() { return mHeight; }
 
