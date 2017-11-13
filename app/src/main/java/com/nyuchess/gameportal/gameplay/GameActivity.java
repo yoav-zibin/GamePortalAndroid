@@ -38,6 +38,15 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     private String MATCH_ID;
     private Game mGame;
 
+    //For differentiating between a click and a drag.
+    //Max allowed duration for a "click", in milliseconds.
+    private static final int MAX_CLICK_DURATION = 1000;
+    // Max allowed distance to move during a "click", in DP.
+    private static final int MAX_CLICK_DISTANCE = 15;
+    private long pressStartTime;
+    private float pressedX;
+    private float pressedY;
+
     //the piece currently being acted on with a touch event, if any
     private GamePiece target;
 
@@ -67,6 +76,9 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                pressStartTime = System.currentTimeMillis();
+                pressedX = event.getX();
+                pressedY = event.getY();
                 //screen touched, check which piece is being touched
                 for (GamePiece piece : mGame.getPieces()) {
                     if (x <= piece.getCurrentState().getX() + piece.getWidth()
@@ -81,64 +93,77 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
             case MotionEvent.ACTION_MOVE:
                 //if a piece is being dragged, move it
                 if (target != null) {
-                    int dx = x - target.getCurrentState().getX();
-                    int dy = y - target.getCurrentState().getY();
-                    target.getCurrentState().setX(target.getCurrentState().getX() + dx);
-                    target.getCurrentState().setY(target.getCurrentState().getY() + dy);
+                    //add half the piece's dimensions so it looks like you're moving them by
+                    //the center instead of the corner
+                    int dx = x - target.getWidth() / 2;
+                    int dy = y - target.getHeight() / 2;
+                    target.getCurrentState().setX(dx);
+                    target.getCurrentState().setY(dy);
                     Log.d(TAG, "ACTION_MOVE");
                     Log.d(TAG, x + ":" + y);
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
-                //let go, update piece's location
+                //let go, update piece's location if it was moved
+                //if it was not moved, toggle the piece's image
                 Log.d(TAG, "ACTION_UP");
                 view.performClick();
-                if(target != null) {
-                    Map<String, Object> loc = new HashMap<>();
-                    int dx = x - target.getPreviousState().getX();
-                    int dy = y - target.getPreviousState().getY();
-                    int newX = (int) ((((double) target.getPreviousState().getX() + dx) /
-                            (double) mGame.getBoard().getWidth()) * 100);
-                    int newY = (int) ((((double) target.getPreviousState().getY() + dy) /
-                            (double) mGame.getBoard().getHeight()) * 100);
-                    loc.put("x", newX);
-                    loc.put("y", newY);
-                    Log.d(TAG, "moving piece to " + newX + ":" + newY);
-//                    Log.d(TAG, ((target.getCurrentState().getX() + dx) / target.getWidth()) + "");
-//                    Log.d(TAG, ((target.getCurrentState().getX() + dx) / target.getHeight()) + "");
-                    FirebaseDatabase.getInstance().getReference(
-                            "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
-                                    "/pieces/" + target.getPieceIndex() + "/currentState")
-                            .updateChildren(loc);
-                    target = null;
+                long pressDuration = System.currentTimeMillis() - pressStartTime;
+                // Click event
+                if (pressDuration < MAX_CLICK_DURATION &&
+                        distance(pressedX, pressedY, event.getX(), event.getY()) < MAX_CLICK_DISTANCE) {
+                    if (target != null){
+                        Log.d(TAG, "ACTION_UP_CLICK");
+                        int newImageIndex = target.getNextImageIndex();
+                        Map<String, Object> newState = new HashMap<>();
+                        newState.put("currentImageIndex", newImageIndex);
+                        Log.d(TAG, "Updating image index to "  + newImageIndex);
+                        FirebaseDatabase.getInstance().getReference(
+                                "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                        "/pieces/" + target.getPieceIndex() + "/currentState")
+                                .updateChildren(newState);
+                        target = null;
+                    }
                 }
+                // Drag event
+                else {
+                    if(target != null) {
+                        Log.d(TAG, "ACTION_UP_DRAG");
+                        Map<String, Object> loc = new HashMap<>();
+                        double nX = x - target.getWidth() / 2;
+                        double nY = y - target.getHeight() / 2;
+                        int newX = (int) (nX / (double) mGame.getBoard().getWidth() * 100);
+                        int newY = (int) (nY / (double) mGame.getBoard().getHeight() * 100);
+                        loc.put("x", newX);
+                        loc.put("y", newY);
+                        Log.d(TAG, "moving piece to " + newX + ":" + newY);
+                        FirebaseDatabase.getInstance().getReference(
+                                "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                        "/pieces/" + target.getPieceIndex() + "/currentState")
+                                .updateChildren(loc);
+                        target = null;
+                    }
+                }
+
                 break;
         }
         if (target != null){
-            target.getCurrentState().setX(x);
-            target.getCurrentState().setY(y);
+            target.getCurrentState().setX(x - target.getWidth() / 2);
+            target.getCurrentState().setY(y - target.getHeight() / 2);
         }
         return true;
     }
 
-
-    private GameBoard getBoard(String gameId){
-        return null;
+    private float distance(float x1, float y1, float x2, float y2) {
+        float dx = x1 - x2;
+        float dy = y1 - y2;
+        float distanceInPx = (float) Math.sqrt(dx * dx + dy * dy);
+        return pxToDp(distanceInPx);
     }
 
-    private List<GamePiece> getPieces(String gameId){
-        return null;
+    private  float pxToDp(float px) {
+        return px / getResources().getDisplayMetrics().density;
     }
 
-
-//    private void draw(){
-        // Draw all the game elements, in order from lowest to highest on Z-axis
-//        Log.d(TAG, "Drawing game board");
-//        mBoard.draw(mCanvas);
-//        for (GamePiece piece: mGamePieces){
-//            Log.d(TAG, "Drawing piece " + piece);
-//            piece.draw(mCanvas);
-//        }
-//    }
 }

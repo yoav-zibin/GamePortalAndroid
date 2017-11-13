@@ -185,10 +185,8 @@ public class GamePiece implements IGameElement {
                                 .child("x").getValue().toString())) / 100 * widthScreen);
                         int y = (int)((Float.parseFloat(dataSnapshot.child("currentState")
                                 .child("y").getValue().toString())) / 100 * heightScreen);
-                        int zDepth = (int)((Float.parseFloat(dataSnapshot.child("currentState")
-                                .child("zDepth").getValue().toString())) / 100 * heightScreen);
-                        int currentImageIndex = (int)((Float.parseFloat(dataSnapshot.child("currentState")
-                                .child("currentImageIndex").getValue().toString())) / 100 * heightScreen);
+                        int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
+                        int currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
                         updatePreviousState();
                         currentState.update(x, y, zDepth, currentImageIndex);
                     }
@@ -200,6 +198,12 @@ public class GamePiece implements IGameElement {
                 });
 
         initialized = true;
+    }
+
+    int getNextImageIndex(){
+        int next = (currentState.currentImageIndex + 1) % images.size();
+        Log.d(TAG, "Next image is " + (next + 1) + "/" + images.size());
+        return (currentState.currentImageIndex + 1) % images.size();
     }
 
     @Override
