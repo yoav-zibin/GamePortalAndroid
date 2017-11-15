@@ -1,6 +1,7 @@
 package com.nyuchess.gameportal.gameplay;
 
 import android.graphics.Canvas;
+import android.util.Log;
 
 import java.util.List;
 

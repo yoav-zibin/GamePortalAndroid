@@ -16,8 +16,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by Jordan on 10/14/2017.
@@ -74,11 +76,47 @@ public class GamePiece implements IGameElement {
         images = new ArrayList<>();
     }
 
+    GamePiece(String gameId, String matchId, String groupId, String cardId, int x, int y, int index, int h, int w){
+        initialized = false;
+        mGroupId = groupId;
+        mMatchId = matchId;
+        mGameId = gameId;
+        images = new ArrayList<>();
+        mDatabase = FirebaseDatabase.getInstance();
+        mStorage = FirebaseStorage.getInstance();
+        pieceElementId = cardId;
+        deckPieceIndex = -1;
+        pieceIndex = index + "";
+        initialState = new PieceState(x, y, 10, 0);
+        currentState = previousState = initialState;
+        heightScreen = h;
+        widthScreen = w;
+        Map<String, Object> state = new HashMap<>();
+        Map<String, Object> details = new HashMap<>();
+        details.put("currentImageIndex", 0);
+        details.put("x", (x / (double) w * 100));
+        details.put("y", (y / (double) h * 100));
+        details.put("zDepth", 10);
+        state.put("currentState", details);
+        Log.d("WHERE ARE YOU", state.toString());
+        mDatabase.getReference("/gamePortal/groups").child(mGroupId).child("matches").child(mMatchId).child("pieces").child(pieceIndex).setValue(state);
+        getFirebaseData();
+    }
+
+    public void setPieceElementId(String Id) {
+        this.pieceElementId = Id;
+    }
+
+    public void nextCard() {
+        deckPieceIndex++;
+    }
+
     void startInit(DataSnapshot dataSnapshot){
         mDatabase = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance();
         pieceElementId = dataSnapshot.child("pieceElementId").getValue().toString();
         deckPieceIndex = (Long) dataSnapshot.child("deckPieceIndex").getValue();
+        Log.d("WHAT", dataSnapshot.toString());
         initialState = dataSnapshot.child("initialState").getValue(PieceState.class);
         Log.d(TAG, "initial state: " + initialState);
         currentState = previousState = initialState;
@@ -112,7 +150,7 @@ public class GamePiece implements IGameElement {
                 });
     }
 
-    private void getFirebaseData() {
+    public void getFirebaseData() {
         mDatabase.getReference("gameBuilder/elements").child(pieceElementId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -188,6 +226,9 @@ public class GamePiece implements IGameElement {
                         int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
                         int currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
                         updatePreviousState();
+                        Log.d("YO", dataSnapshot.toString());
+                        Log.d("YO", dataSnapshot.child("currentState").child("x").getValue().toString());
+                        Log.d("YO", x + " " + y);
                         currentState.update(x, y, zDepth, currentImageIndex);
                     }
 

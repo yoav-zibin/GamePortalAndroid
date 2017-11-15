@@ -71,8 +71,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
+        final int x = (int) event.getX();
+        final int y = (int) event.getY();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -85,7 +85,26 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             && x >= piece.getCurrentState().getX()
                             && y >= piece.getCurrentState().getY()
                             && y <= piece.getCurrentState().getY() + piece.getHeight()) {
-                        target = piece;
+                        if(piece.getDeckPieceIndex() != -1) {
+                            Log.d(TAG,"TRYING TO DRAG A CARD OUT");
+                            FirebaseDatabase.getInstance().getReference("/gameBuilder/elements").child(piece.getPieceElementId()).child("deckElements").child(piece.getDeckPieceIndex() + "").child("deckMemberElementId").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    GamePiece card = new GamePiece(gameId, MATCH_ID, GROUP_ID, dataSnapshot.getValue().toString(), x, y, mGame.getPieces().size(), mGame.getBoard().getHeight(), mGame.getBoard().getWidth());
+                                    mGame.getPieces().add(card);
+                                    target = card;
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                            piece.nextCard();
+                        } else {
+                            Log.d("PICKED", piece.getPieceElementId());
+                            target = piece;
+                        }
                         break;
                     }
                 }
@@ -105,6 +124,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 break;
 
             case MotionEvent.ACTION_UP:
+                // Vic test = -KyrfBOT-F2mPKdMEvzX
                 //let go, update piece's location if it was moved
                 //if it was not moved, toggle the piece's image
                 Log.d(TAG, "ACTION_UP");
@@ -142,6 +162,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                 "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
                                         "/pieces/" + target.getPieceIndex() + "/currentState")
                                 .updateChildren(loc);
+                        Log.d("YO1", target.getPieceElementId() + " x " + target.getCurrentState().getX());
                         target = null;
                     }
                 }
@@ -151,6 +172,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         if (target != null){
             target.getCurrentState().setX(x - target.getWidth() / 2);
             target.getCurrentState().setY(y - target.getHeight() / 2);
+            Log.d("What are you doing", "" + target.getCurrentState().getX());
+            Log.d("What are you doing", "" + target.getCurrentState().getY());
         }
         return true;
     }

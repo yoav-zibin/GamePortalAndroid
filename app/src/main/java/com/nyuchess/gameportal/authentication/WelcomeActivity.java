@@ -100,6 +100,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         username = mAuth.getCurrentUser().getDisplayName();
         mWelcomeTextView.setText("Welcome, " + pub.get("displayName"));
         initialiseOnlinePresence();
+        Log.d(TAG, "welcome");
     }
 
     @Override
