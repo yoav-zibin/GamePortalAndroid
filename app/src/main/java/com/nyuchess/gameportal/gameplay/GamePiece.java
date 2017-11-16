@@ -302,6 +302,10 @@ public class GamePiece implements IGameElement {
         this.angle = angle;
     }
 
+    public int getAngle() {
+        return angle;
+    }
+
     static public class PieceState {
         private int x;
         private int y;

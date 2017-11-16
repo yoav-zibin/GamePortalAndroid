@@ -145,7 +145,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                         double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1)-
                                 Math.atan2(x3 - x1, y3 - y1));
 
-                        target.setAngle((int) -angle);
+                        target.setAngle(target.getAngle() + (int) -angle);
 
 
                     } else {
