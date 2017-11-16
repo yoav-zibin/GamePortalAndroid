@@ -266,9 +266,14 @@ public class GamePiece implements IGameElement, Comparable {
     }
 
     int getNextImageIndex(){
+        if(type.equals("dice")) {
+            int next = (int)(Math.random() * images.size());
+            return next;
+        } else {
             int next = (currentState.currentImageIndex + 1) % images.size();
             Log.d(TAG, "Next image is " + (next + 1) + "/" + images.size());
             return (currentState.currentImageIndex + 1) % images.size();
+        }
     }
 
     @Override
