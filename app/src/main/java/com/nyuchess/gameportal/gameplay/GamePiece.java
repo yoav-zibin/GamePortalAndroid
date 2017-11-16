@@ -3,6 +3,7 @@ package com.nyuchess.gameportal.gameplay;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -50,6 +51,7 @@ public class GamePiece implements IGameElement {
     private String mGroupId;
     private String mMatchId;
     private String mGameId;
+    private int angle;
 
     private int heightScreen = 1;
     private int widthScreen = 1;
@@ -73,6 +75,7 @@ public class GamePiece implements IGameElement {
         mGroupId = groupId;
         mMatchId = matchId;
         mGameId = gameId;
+        angle = 0;
         images = new ArrayList<>();
     }
 
@@ -226,9 +229,6 @@ public class GamePiece implements IGameElement {
                         int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
                         int currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
                         updatePreviousState();
-                        Log.d("YO", dataSnapshot.toString());
-                        Log.d("YO", dataSnapshot.child("currentState").child("x").getValue().toString());
-                        Log.d("YO", x + " " + y);
                         currentState.update(x, y, zDepth, currentImageIndex);
                     }
 
@@ -249,13 +249,21 @@ public class GamePiece implements IGameElement {
 
     @Override
     public void draw(Canvas canvas) {
-        if (!initialized){
+        if (!initialized) {
             Log.v(TAG, "not yet drawing piece " + pieceElementId);
             return;
         }
+        Matrix matrix = new Matrix();
+
+        matrix.reset();
+        matrix.postTranslate(-images.get(currentState.getCurrentImageIndex()).getWidth() / 2, -images.get(currentState.getCurrentImageIndex()).getHeight() / 2); // Centers image
+        matrix.postRotate(angle);
+        matrix.postTranslate(currentState.getX(), currentState.getY());
+        canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()), matrix, null);
+
         Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());
-        canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()),
-                currentState.getX(), currentState.getY(), null);
+        //canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()),
+        //      currentState.getX(), currentState.getY(), null);
     }
 
     public String getGroupId() {
@@ -289,6 +297,10 @@ public class GamePiece implements IGameElement {
     public int getWidth() {return mWidth; }
 
     public String getPieceIndex() { return pieceIndex; }
+
+    public void setAngle(int angle) {
+        this.angle = angle;
+    }
 
     static public class PieceState {
         private int x;

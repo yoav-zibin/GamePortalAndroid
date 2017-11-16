@@ -47,6 +47,11 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     private float pressedX;
     private float pressedY;
 
+    private float prevX = Float.MIN_VALUE;
+    private float prevY = Float.MIN_VALUE;
+
+    private int onScreen = 0;
+
     //the piece currently being acted on with a touch event, if any
     private GamePiece target;
 
@@ -81,10 +86,10 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 pressedY = event.getY();
                 //screen touched, check which piece is being touched
                 for (GamePiece piece : mGame.getPieces()) {
-                    if (x <= piece.getCurrentState().getX() + piece.getWidth()
-                            && x >= piece.getCurrentState().getX()
-                            && y >= piece.getCurrentState().getY()
-                            && y <= piece.getCurrentState().getY() + piece.getHeight()) {
+                    if (x <= piece.getCurrentState().getX() + (piece.getWidth()/2)
+                            && x >= piece.getCurrentState().getX() - (piece.getWidth()/2)
+                            && y >= piece.getCurrentState().getY() - (piece.getHeight()/2)
+                            && y <= piece.getCurrentState().getY() + (piece.getHeight()/2)) {
                         if(piece.getDeckPieceIndex() != -1) {
                             Log.d(TAG,"TRYING TO DRAG A CARD OUT");
                             FirebaseDatabase.getInstance().getReference("/gameBuilder/elements").child(piece.getPieceElementId()).child("deckElements").child(piece.getDeckPieceIndex() + "").child("deckMemberElementId").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -105,6 +110,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             Log.d("PICKED", piece.getPieceElementId());
                             target = piece;
                         }
+                        Log.w(TAG, "Picked at " + x + "," + y + " and real bounds are " + piece.getCurrentState().getX() + " " + piece.getCurrentState().getY() + " " + piece.getWidth() + " " + piece.getHeight());
+                        Log.w(TAG, "" + piece.getCurrentState().getX() + " " + (piece.getCurrentState().getX() + piece.getWidth()) + " " + piece.getCurrentState().getY() + " " + (piece.getCurrentState().getY() + piece.getHeight()));
                         break;
                     }
                 }
@@ -114,12 +121,43 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 if (target != null) {
                     //add half the piece's dimensions so it looks like you're moving them by
                     //the center instead of the corner
-                    int dx = x - target.getWidth() / 2;
-                    int dy = y - target.getHeight() / 2;
-                    target.getCurrentState().setX(dx);
-                    target.getCurrentState().setY(dy);
-                    Log.d(TAG, "ACTION_MOVE");
-                    Log.d(TAG, x + ":" + y);
+                    if(event.getPointerCount() == 2) {
+
+                        if(prevY == Float.MIN_VALUE) {
+                            prevY = event.getY(1);
+                            Log.d(TAG, "SETTING VAL1");
+                        }
+
+                        if(prevX == Float.MIN_VALUE) {
+                            prevX = event.getX(1);
+                            Log.d(TAG, "SETTING VAL2");
+                        }
+
+                        float x1 = event.getX(0);
+                        float y1 = event.getY(0);
+
+                        float x2 = event.getX(1);
+                        float y2 = event.getY(1);
+
+                        float x3 = prevX;
+                        float y3 = prevY;
+
+                        double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1)-
+                                Math.atan2(x3 - x1, y3 - y1));
+
+                        target.setAngle((int) -angle);
+
+
+                    } else {
+                        int dx = target.getCurrentState().getX() + (target.getCurrentState().getX() - x);
+                        int dy = target.getCurrentState().getX() + (y - target.getCurrentState().getY());
+                        target.getCurrentState().setX(x);
+                        target.getCurrentState().setY(y);
+                        Log.d(TAG, "ACTION_MOVE");
+                        Log.d(TAG, dx + ":" + dy);
+                    }
+                } else {
+
                 }
                 break;
 
@@ -148,11 +186,11 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 }
                 // Drag event
                 else {
-                    if(target != null) {
+                    if(target != null && event.getPointerCount() == 1) {
                         Log.d(TAG, "ACTION_UP_DRAG");
                         Map<String, Object> loc = new HashMap<>();
-                        double nX = x - target.getWidth() / 2;
-                        double nY = y - target.getHeight() / 2;
+                        double nX = x;
+                        double nY = y;
                         int newX = (int) (nX / (double) mGame.getBoard().getWidth() * 100);
                         int newY = (int) (nY / (double) mGame.getBoard().getHeight() * 100);
                         loc.put("x", newX);
@@ -164,16 +202,17 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                 .updateChildren(loc);
                         Log.d("YO1", target.getPieceElementId() + " x " + target.getCurrentState().getX());
                         target = null;
+                    } else {
+                        Log.d(TAG, "LIFTED UP A POINTER");
                     }
                 }
 
                 break;
         }
-        if (target != null){
-            target.getCurrentState().setX(x - target.getWidth() / 2);
-            target.getCurrentState().setY(y - target.getHeight() / 2);
-            Log.d("What are you doing", "" + target.getCurrentState().getX());
-            Log.d("What are you doing", "" + target.getCurrentState().getY());
+        if(event.getAction() == 262) {
+            Log.d(TAG, "LIFTED UP POINTER");
+            prevX = Float.MIN_VALUE;
+            prevY = Float.MIN_VALUE;
         }
         return true;
     }
