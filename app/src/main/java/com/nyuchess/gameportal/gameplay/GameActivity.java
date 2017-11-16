@@ -6,12 +6,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +57,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     private float prevY = Float.MIN_VALUE;
 
     private int onScreen = 0;
+    private int rotate;
 
     //the piece currently being acted on with a touch event, if any
     private GamePiece target;
@@ -78,7 +85,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     public boolean onTouch(View view, MotionEvent event) {
         final int x = (int) event.getX();
         final int y = (int) event.getY();
-
+        //Log.w(TAG, "GROUP " + GROUP_ID + " " + gameId);
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 pressStartTime = System.currentTimeMillis();
@@ -86,33 +93,56 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 pressedY = event.getY();
                 //screen touched, check which piece is being touched
                 for (GamePiece piece : mGame.getPieces()) {
-                    if (x <= piece.getCurrentState().getX() + (piece.getWidth()/2)
-                            && x >= piece.getCurrentState().getX() - (piece.getWidth()/2)
-                            && y >= piece.getCurrentState().getY() - (piece.getHeight()/2)
-                            && y <= piece.getCurrentState().getY() + (piece.getHeight()/2)) {
-                        if(piece.getDeckPieceIndex() != -1) {
-                            Log.d(TAG,"TRYING TO DRAG A CARD OUT");
-                            FirebaseDatabase.getInstance().getReference("/gameBuilder/elements").child(piece.getPieceElementId()).child("deckElements").child(piece.getDeckPieceIndex() + "").child("deckMemberElementId").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    GamePiece card = new GamePiece(gameId, MATCH_ID, GROUP_ID, dataSnapshot.getValue().toString(), x, y, mGame.getPieces().size(), mGame.getBoard().getHeight(), mGame.getBoard().getWidth());
-                                    mGame.getPieces().add(card);
-                                    target = card;
-                                }
+                    if (x <= piece.getCurrentState().getX() + (piece.getWidth() / 2)
+                            && x >= piece.getCurrentState().getX() - (piece.getWidth() / 2)
+                            && y >= piece.getCurrentState().getY() - (piece.getHeight() / 2)
+                            && y <= piece.getCurrentState().getY() + (piece.getHeight() / 2)) {
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
+                        if(piece.getType().equals("cardsDeck")) {
+                            for(int i = 0 ; i < mGame.getPieces().size(); i ++) {
+                                GamePiece log = mGame.getPieces().get(i);
+                                if((int)mGame.getPieces().get(i).getDeckPieceIndex() == Integer.parseInt(piece.getPieceIndex())
+                                        && mGame.getPieces().get(i).getCurrentState().getX() == mGame.getPieces().get(i).getInitialState().getX()
+                                        && mGame.getPieces().get(i).getCurrentState().getY() == mGame.getPieces().get(i).getInitialState().getY()) {
+                                    target = mGame.getPieces().get(i);
+                                    rotate = target.getAngle();
+                                    Log.d(TAG, "PICKED UP A CARD");
+                                    break;
                                 }
-                            });
-                            piece.nextCard();
+                            }
+
+                            if(target == null) {
+                                Toast.makeText(this, "No more Cards!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        target.setCanSee(true);
+                                        Map<String, Object> see = new HashMap<>();
+                                        see.put(dataSnapshot.child("participantIndex").getValue().toString(), true);
+                                        Log.w("LMAO", "" + see);
+                                        Log.w("LMAO", dataSnapshot.toString());
+                                        mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                                "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").updateChildren(see);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
                         } else {
+
                             Log.d("PICKED", piece.getPieceElementId());
                             target = piece;
+                            rotate = target.getAngle();
+
+                            Collections.sort(mGame.getPieces());
+
+                            break;
                         }
-                        Log.w(TAG, "Picked at " + x + "," + y + " and real bounds are " + piece.getCurrentState().getX() + " " + piece.getCurrentState().getY() + " " + piece.getWidth() + " " + piece.getHeight());
-                        Log.w(TAG, "" + piece.getCurrentState().getX() + " " + (piece.getCurrentState().getX() + piece.getWidth()) + " " + piece.getCurrentState().getY() + " " + (piece.getCurrentState().getY() + piece.getHeight()));
-                        break;
                     }
                 }
                 break;
@@ -121,14 +151,14 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 if (target != null) {
                     //add half the piece's dimensions so it looks like you're moving them by
                     //the center instead of the corner
-                    if(event.getPointerCount() == 2) {
+                    if (event.getPointerCount() == 2) {
 
-                        if(prevY == Float.MIN_VALUE) {
+                        if (prevY == Float.MIN_VALUE) {
                             prevY = event.getY(1);
                             Log.d(TAG, "SETTING VAL1");
                         }
 
-                        if(prevX == Float.MIN_VALUE) {
+                        if (prevX == Float.MIN_VALUE) {
                             prevX = event.getX(1);
                             Log.d(TAG, "SETTING VAL2");
                         }
@@ -142,10 +172,12 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                         float x3 = prevX;
                         float y3 = prevY;
 
-                        double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1)-
+                        double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1) -
                                 Math.atan2(x3 - x1, y3 - y1));
 
-                        target.setAngle(target.getAngle() + (int) -angle);
+                        Log.w("WHAT", "" + angle);
+
+                        target.setAngle(rotate - (int)angle);
 
 
                     } else {
@@ -171,12 +203,12 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 // Click event
                 if (pressDuration < MAX_CLICK_DURATION &&
                         distance(pressedX, pressedY, event.getX(), event.getY()) < MAX_CLICK_DISTANCE) {
-                    if (target != null){
+                    if (target != null) {
                         Log.d(TAG, "ACTION_UP_CLICK");
                         int newImageIndex = target.getNextImageIndex();
                         Map<String, Object> newState = new HashMap<>();
                         newState.put("currentImageIndex", newImageIndex);
-                        Log.d(TAG, "Updating image index to "  + newImageIndex);
+                        Log.d(TAG, "Updating image index to " + newImageIndex);
                         FirebaseDatabase.getInstance().getReference(
                                 "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
                                         "/pieces/" + target.getPieceIndex() + "/currentState")
@@ -186,7 +218,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 }
                 // Drag event
                 else {
-                    if(target != null && event.getPointerCount() == 1) {
+                    if (target != null && event.getPointerCount() == 1) {
                         Log.d(TAG, "ACTION_UP_DRAG");
                         Map<String, Object> loc = new HashMap<>();
                         double nX = x;
@@ -209,7 +241,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
                 break;
         }
-        if(event.getAction() == 262) {
+        if (event.getAction() == 262) {
             Log.d(TAG, "LIFTED UP POINTER");
             prevX = Float.MIN_VALUE;
             prevY = Float.MIN_VALUE;
@@ -224,7 +256,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         return pxToDp(distanceInPx);
     }
 
-    private  float pxToDp(float px) {
+    private float pxToDp(float px) {
         return px / getResources().getDisplayMetrics().density;
     }
 

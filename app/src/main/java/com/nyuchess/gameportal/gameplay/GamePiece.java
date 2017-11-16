@@ -9,8 +9,10 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -26,7 +28,7 @@ import java.util.Map;
  * Created by Jordan on 10/14/2017.
  */
 
-public class GamePiece implements IGameElement {
+public class GamePiece implements IGameElement, Comparable {
 
     private static final String TAG = "GamePiece";
 
@@ -52,9 +54,10 @@ public class GamePiece implements IGameElement {
     private String mMatchId;
     private String mGameId;
     private int angle;
-
+    private String type;
     private int heightScreen = 1;
     private int widthScreen = 1;
+    private boolean canSee = false;
 
     public PieceState getInitialState() {
         return initialState;
@@ -79,41 +82,6 @@ public class GamePiece implements IGameElement {
         images = new ArrayList<>();
     }
 
-    GamePiece(String gameId, String matchId, String groupId, String cardId, int x, int y, int index, int h, int w){
-        initialized = false;
-        mGroupId = groupId;
-        mMatchId = matchId;
-        mGameId = gameId;
-        images = new ArrayList<>();
-        mDatabase = FirebaseDatabase.getInstance();
-        mStorage = FirebaseStorage.getInstance();
-        pieceElementId = cardId;
-        deckPieceIndex = -1;
-        pieceIndex = index + "";
-        initialState = new PieceState(x, y, 10, 0);
-        currentState = previousState = initialState;
-        heightScreen = h;
-        widthScreen = w;
-        Map<String, Object> state = new HashMap<>();
-        Map<String, Object> details = new HashMap<>();
-        details.put("currentImageIndex", 0);
-        details.put("x", (x / (double) w * 100));
-        details.put("y", (y / (double) h * 100));
-        details.put("zDepth", 10);
-        state.put("currentState", details);
-        Log.d("WHERE ARE YOU", state.toString());
-        mDatabase.getReference("/gamePortal/groups").child(mGroupId).child("matches").child(mMatchId).child("pieces").child(pieceIndex).setValue(state);
-        getFirebaseData();
-    }
-
-    public void setPieceElementId(String Id) {
-        this.pieceElementId = Id;
-    }
-
-    public void nextCard() {
-        deckPieceIndex++;
-    }
-
     void startInit(DataSnapshot dataSnapshot){
         mDatabase = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance();
@@ -121,8 +89,30 @@ public class GamePiece implements IGameElement {
         deckPieceIndex = (Long) dataSnapshot.child("deckPieceIndex").getValue();
         Log.d("WHAT", dataSnapshot.toString());
         initialState = dataSnapshot.child("initialState").getValue(PieceState.class);
-        Log.d(TAG, "initial state: " + initialState);
-        currentState = previousState = initialState;
+                Log.d(TAG, "initial state: " + initialState);
+        if(dataSnapshot.child("initialState").child("cardVisibility") != null) {
+            final DataSnapshot children = dataSnapshot;
+            DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + mGroupId + "/participants/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+            pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot2) {
+                    String index = dataSnapshot2.child("participantIndex").getValue().toString();
+                    for(DataSnapshot child : children.child("initialState").child("cardVisibility").getChildren()) {
+                        if(child.getKey().equals(index)) {
+                            canSee = true;
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        currentState = dataSnapshot.child("initialState").getValue(PieceState.class);
+        Log.w(TAG, "" + currentState);
+        previousState = dataSnapshot.child("initialState").getValue(PieceState.class);
         this.pieceIndex = dataSnapshot.getKey();
         mDatabase.getReference("gameBuilder/gameSpecs").child(mGameId).child("board")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -135,6 +125,8 @@ public class GamePiece implements IGameElement {
                             public void onDataChange(DataSnapshot image) {
                                 heightScreen = Integer.parseInt(image.child("height").getValue().toString());
                                 widthScreen = Integer.parseInt(image.child("width").getValue().toString());
+                                initialState.setX((int) (initialState.getX() / 100.0 * widthScreen));
+                                initialState.setY((int) (initialState.getY() / 100.0 * heightScreen));
                                 //get the actual image itself
                                 getFirebaseData();
                             }
@@ -160,6 +152,10 @@ public class GamePiece implements IGameElement {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Log.d(TAG, "Got data snapshot for piece element " + pieceElementId);
                         //now get the actual images
+                        type = dataSnapshot.child("elementKind").getValue().toString();
+                        if(!type.equals("card")) {
+                            canSee = true;
+                        }
                         final int imageCount = (int) dataSnapshot.child("images").getChildrenCount();
                         for (DataSnapshot imageIdDs : dataSnapshot.child("images").getChildren()) {
                             String imageId = imageIdDs.child("imageId").getValue().toString();
@@ -221,15 +217,40 @@ public class GamePiece implements IGameElement {
                 .addValueEventListener(new ValueEventListener() {
 
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
-                                .child("x").getValue().toString())) / 100 * widthScreen);
-                        int y = (int)((Float.parseFloat(dataSnapshot.child("currentState")
-                                .child("y").getValue().toString())) / 100 * heightScreen);
-                        int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
-                        int currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
-                        updatePreviousState();
-                        currentState.update(x, y, zDepth, currentImageIndex);
+                    public void onDataChange(DataSnapshot dataSnapshot1) {
+                        final DataSnapshot dataSnapshot = dataSnapshot1;
+                        DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + mGroupId + "/participants/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot2) {
+                                if(dataSnapshot.child("currentState").child("cardVisibility") != null) {
+                                    String index = dataSnapshot2.child("participantIndex").getValue().toString();
+                                    for (DataSnapshot child : dataSnapshot.child("currentState").child("cardVisibility").getChildren()) {
+                                        if(child.getKey().equals(index)) {
+                                            canSee = true;
+                                        }
+                                    }
+                                }
+                                int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
+                                        .child("x").getValue().toString())) / 100 * widthScreen);
+                                int y = (int)((Float.parseFloat(dataSnapshot.child("currentState")
+                                        .child("y").getValue().toString())) / 100 * heightScreen);
+                                int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
+                                int currentImageIndex = currentState.getCurrentImageIndex();
+                                if(type.equals("card") && canSee) {
+                                    currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
+                                } else if(!type.equals("card")) {
+                                    currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
+                                }
+                                updatePreviousState();
+                                currentState.update(x, y, zDepth, currentImageIndex);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                     }
 
                     @Override
@@ -242,15 +263,15 @@ public class GamePiece implements IGameElement {
     }
 
     int getNextImageIndex(){
-        int next = (currentState.currentImageIndex + 1) % images.size();
-        Log.d(TAG, "Next image is " + (next + 1) + "/" + images.size());
-        return (currentState.currentImageIndex + 1) % images.size();
+            int next = (currentState.currentImageIndex + 1) % images.size();
+            Log.d(TAG, "Next image is " + (next + 1) + "/" + images.size());
+            return (currentState.currentImageIndex + 1) % images.size();
     }
 
     @Override
     public void draw(Canvas canvas) {
         if (!initialized) {
-            Log.v(TAG, "not yet drawing piece " + pieceElementId);
+            //Log.v(TAG, "not yet drawing piece " + pieceElementId);
             return;
         }
         Matrix matrix = new Matrix();
@@ -261,7 +282,7 @@ public class GamePiece implements IGameElement {
         matrix.postTranslate(currentState.getX(), currentState.getY());
         canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()), matrix, null);
 
-        Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());
+        //Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());
         //canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()),
         //      currentState.getX(), currentState.getY(), null);
     }
@@ -304,6 +325,19 @@ public class GamePiece implements IGameElement {
 
     public int getAngle() {
         return angle;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.getCurrentState().getzDepth() - ((GamePiece)o).getCurrentState().getzDepth();
+    }
+
+    public void setCanSee(boolean canSee) {
+        this.canSee = canSee;
     }
 
     static public class PieceState {
