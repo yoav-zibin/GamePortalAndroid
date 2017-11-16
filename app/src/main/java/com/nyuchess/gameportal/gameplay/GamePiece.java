@@ -58,6 +58,7 @@ public class GamePiece implements IGameElement, Comparable {
     private int heightScreen = 1;
     private int widthScreen = 1;
     private boolean canSee = false;
+    private int maxRotate;
 
     public PieceState getInitialState() {
         return initialState;
@@ -156,6 +157,8 @@ public class GamePiece implements IGameElement, Comparable {
                         if(!type.equals("card")) {
                             canSee = true;
                         }
+
+                        maxRotate = (int)(long)(Long)dataSnapshot.child("rotatableDegrees").getValue();
                         final int imageCount = (int) dataSnapshot.child("images").getChildrenCount();
                         for (DataSnapshot imageIdDs : dataSnapshot.child("images").getChildren()) {
                             String imageId = imageIdDs.child("imageId").getValue().toString();
@@ -338,6 +341,10 @@ public class GamePiece implements IGameElement, Comparable {
 
     public void setCanSee(boolean canSee) {
         this.canSee = canSee;
+    }
+
+    public int getMaxRotate() {
+        return maxRotate;
     }
 
     static public class PieceState {

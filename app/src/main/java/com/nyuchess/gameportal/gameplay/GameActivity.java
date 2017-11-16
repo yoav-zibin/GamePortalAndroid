@@ -177,7 +177,9 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
                         Log.w("WHAT", "" + angle);
 
-                        target.setAngle(rotate - (int)angle);
+                        if(Math.abs(rotate - (int) angle) < target.getMaxRotate()) {
+                            target.setAngle(rotate - (int) angle);
+                        }
 
 
                     } else {
