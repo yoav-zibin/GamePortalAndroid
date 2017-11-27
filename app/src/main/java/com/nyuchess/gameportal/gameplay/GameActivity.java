@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,10 +58,13 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     private float prevX = Float.MIN_VALUE;
     private float prevY = Float.MIN_VALUE;
 
+    private ArrayList<Integer> history;
+    private ArrayList<GamePiece> historyRef;
     private GamePiece lastLinesTarget;
     private int lastLines;
     private float linePX;
     private float linePY;
+    private int fontSize = 1;
 
     private int onScreen = 0;
     private int rotate;
@@ -87,8 +92,32 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         mGameView.setGame(mGame);
         mGameView.setOnTouchListener(this);
         draw = false;
+        history = new ArrayList<>();
+        historyRef = new ArrayList<>();
         findViewById(R.id.drawButton).setOnClickListener(this);
         findViewById(R.id.undoButton).setOnClickListener(this);
+        SeekBar fontSize = (SeekBar) findViewById(R.id.fontSize);
+        fontSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d(TAG, "" + seekBar.getProgress());
+                setFontSize(seekBar.getProgress());
+            }
+        });
+    }
+
+    public void setFontSize(int x) {
+        fontSize = (int)(1 + ((x / 100.0) * 9));
     }
 
     @Override
@@ -117,7 +146,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                     target = mGame.getPieces().get(i);
                                     rotate = target.getAngle();
                                     if(target != null && draw) {
-                                        lastLinesTarget = target;
+                                        historyRef.add(target);
                                         lastLines = 0;
                                         linePX = event.getX();
                                         linePY = event.getY();
@@ -156,7 +185,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             rotate = target.getAngle();
 
                             if(target != null && draw) {
-                                lastLinesTarget = target;
+                                historyRef.add(target);
                                 lastLines = 0;
                                 linePX = event.getX();
                                 linePY = event.getY();
@@ -178,7 +207,13 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                 && x >= target.getCurrentState().getX() - (target.getWidth() / 2)
                                 && y >= target.getCurrentState().getY() - (target.getHeight() / 2)
                                 && y <= target.getCurrentState().getY() + (target.getHeight() / 2)) {
-                            FingerLine line = new FingerLine(linePX, event.getX(), linePY, event.getY(), 0xFF000000, 10);
+                            EditText getColor = (EditText)findViewById(R.id.hexColor);
+                            String color = getColor.getText().toString();
+                            if(color.length() != 6) {
+                                color = "000000";
+                            }
+                            int hex = (int) Long.parseLong("FF" + color, 16);
+                            FingerLine line = new FingerLine(linePX, event.getX(), linePY, event.getY(), hex, fontSize);
                             target.getDrawings().add(line);
                             lastLines++;
                             linePX = event.getX();
@@ -250,6 +285,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                     if (target != null) {
                         if(draw) {
                             Log.d(TAG, "dot");
+                            history.add(lastLines);
                             target = null;
                         } else {
                             Log.d(TAG, "ACTION_UP_CLICK");
@@ -269,6 +305,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 else {
                     if (target != null && event.getPointerCount() == 1) {
                         if(draw) {
+                            history.add(lastLines);
                             target = null;
                         } else {
                             Log.d(TAG, "ACTION_UP_DRAG");
@@ -324,11 +361,15 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
             }
             draw = !draw;
         } else if(v == R.id.undoButton) {
-            if(lastLinesTarget != null) {
-                for(int i = 0; i < lastLines; i ++) {
+            if(history.size() > 0) {
+                int tbr = history.get(history.size() - 1);
+                GamePiece ref = historyRef.get(historyRef.size() - 1);
+                for(int i = 0; i < tbr; i ++) {
                     Log.d(TAG, "Removing lines");
-                    lastLinesTarget.getDrawings().remove(lastLinesTarget.getDrawings().size() - 1);
+                    ref.getDrawings().remove(ref.getDrawings().size() - 1);
                 }
+                history.remove(history.size() - 1);
+                historyRef.remove(historyRef.size() - 1);
             }
         }
     }
