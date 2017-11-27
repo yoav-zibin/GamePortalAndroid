@@ -295,10 +295,12 @@ public class GamePiece implements IGameElement, Comparable {
         canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()), matrix, null);
 
         for(int i = 0; i < drawings.size(); i++) {
-            Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mPaint.setStrokeWidth(drawings.get(i).getThickness());
-            mPaint.setColor(drawings.get(i).getColor());
-            canvas.drawLine(drawings.get(i).getFromX(), drawings.get(i).getFromY(), drawings.get(i).getToX(), drawings.get(i).getToY(), mPaint);
+            if(drawings.get(i).getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                mPaint.setStrokeWidth(drawings.get(i).getThickness());
+                mPaint.setColor(drawings.get(i).getColor());
+                canvas.drawLine(drawings.get(i).getFromX(), drawings.get(i).getFromY(), drawings.get(i).getToX(), drawings.get(i).getToY(), mPaint);
+            }
         }
 
         //Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());

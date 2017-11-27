@@ -219,12 +219,17 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
 
                         } else {
-                            int dx = target.getCurrentState().getX() + (target.getCurrentState().getX() - x);
-                            int dy = target.getCurrentState().getX() + (y - target.getCurrentState().getY());
-                            target.getCurrentState().setX(x);
-                            target.getCurrentState().setY(y);
+                            int dx = (x - target.getCurrentState().getX());
+                            int dy = (y - target.getCurrentState().getY());
+                            target.getCurrentState().setX(target.getCurrentState().getX() + dx);
+                            target.getCurrentState().setY(target.getCurrentState().getY() + dy);
                             Log.d(TAG, "ACTION_MOVE");
-                            Log.d(TAG, dx + ":" + dy);
+
+                            for(int i = 0; i < target.getDrawings().size(); i++) {
+                                target.getDrawings().get(i).changeXBy(dx);
+                                target.getDrawings().get(i).changeYBy(dy);
+                            }
+                            //Log.d(TAG, dx + ":" + dy);
                         }
                     }
                 } else {

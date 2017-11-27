@@ -48,4 +48,18 @@ public class FingerLine {
     public float getFromX() {
         return fromX;
     }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void changeXBy(int dx) {
+        this.fromX += dx;
+        this.toX += dx;
+    }
+
+    public void changeYBy (int dy) {
+        this.fromY += dy;
+        this.toY += dy;
+    }
 }
