@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -60,6 +61,8 @@ public class GamePiece implements IGameElement, Comparable {
     private boolean canSee = false;
     private int maxRotate;
 
+    private ArrayList<FingerLine> drawings;
+
     public PieceState getInitialState() {
         return initialState;
     }
@@ -81,6 +84,7 @@ public class GamePiece implements IGameElement, Comparable {
         mGameId = gameId;
         angle = 0;
         images = new ArrayList<>();
+        drawings = new ArrayList<>();
     }
 
     void startInit(DataSnapshot dataSnapshot){
@@ -290,6 +294,13 @@ public class GamePiece implements IGameElement, Comparable {
         matrix.postTranslate(currentState.getX(), currentState.getY());
         canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()), matrix, null);
 
+        for(int i = 0; i < drawings.size(); i++) {
+            Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mPaint.setStrokeWidth(drawings.get(i).getThickness());
+            mPaint.setColor(drawings.get(i).getColor());
+            canvas.drawLine(drawings.get(i).getFromX(), drawings.get(i).getFromY(), drawings.get(i).getToX(), drawings.get(i).getToY(), mPaint);
+        }
+
         //Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());
         //canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()),
         //      currentState.getX(), currentState.getY(), null);
@@ -350,6 +361,10 @@ public class GamePiece implements IGameElement, Comparable {
 
     public int getMaxRotate() {
         return maxRotate;
+    }
+
+    public ArrayList<FingerLine> getDrawings() {
+        return drawings;
     }
 
     static public class PieceState {

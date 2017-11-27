@@ -25,7 +25,7 @@ import java.util.Map;
 import com.nyuchess.gameportal.R;
 import com.nyuchess.gameportal.groups.User;
 
-public class GameActivity extends AppCompatActivity implements View.OnTouchListener {
+public class GameActivity extends AppCompatActivity implements View.OnTouchListener, View.OnClickListener {
 
     // The activity where an actual game is played.
     // The game should be drawn on one big SurfaceView, and allow dragging pieces around
@@ -56,8 +56,15 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     private float prevX = Float.MIN_VALUE;
     private float prevY = Float.MIN_VALUE;
 
+    private GamePiece lastLinesTarget;
+    private int lastLines;
+    private float linePX;
+    private float linePY;
+
     private int onScreen = 0;
     private int rotate;
+
+    private boolean draw;
 
     //the piece currently being acted on with a touch event, if any
     private GamePiece target;
@@ -79,6 +86,9 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         mGameView = findViewById(R.id.game_view);
         mGameView.setGame(mGame);
         mGameView.setOnTouchListener(this);
+        draw = false;
+        findViewById(R.id.drawButton).setOnClickListener(this);
+        findViewById(R.id.undoButton).setOnClickListener(this);
     }
 
     @Override
@@ -106,6 +116,12 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                         && mGame.getPieces().get(i).getCurrentState().getY() == mGame.getPieces().get(i).getInitialState().getY()) {
                                     target = mGame.getPieces().get(i);
                                     rotate = target.getAngle();
+                                    if(target != null && draw) {
+                                        lastLinesTarget = target;
+                                        lastLines = 0;
+                                        linePX = event.getX();
+                                        linePY = event.getY();
+                                    }
                                     Log.d(TAG, "PICKED UP A CARD");
                                     break;
                                 }
@@ -139,6 +155,13 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             target = piece;
                             rotate = target.getAngle();
 
+                            if(target != null && draw) {
+                                lastLinesTarget = target;
+                                lastLines = 0;
+                                linePX = event.getX();
+                                linePY = event.getY();
+                            }
+
                             Collections.sort(mGame.getPieces());
 
                             break;
@@ -149,46 +172,60 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
             case MotionEvent.ACTION_MOVE:
                 //if a piece is being dragged, move it
                 if (target != null) {
-                    //add half the piece's dimensions so it looks like you're moving them by
-                    //the center instead of the corner
-                    if (event.getPointerCount() == 2) {
-
-                        if (prevY == Float.MIN_VALUE) {
-                            prevY = event.getY(1);
-                            Log.d(TAG, "SETTING VAL1");
+                    if(draw) {
+                        Log.d(TAG, "Trying to draw");
+                        if(x <= target.getCurrentState().getX() + (target.getWidth() / 2)
+                                && x >= target.getCurrentState().getX() - (target.getWidth() / 2)
+                                && y >= target.getCurrentState().getY() - (target.getHeight() / 2)
+                                && y <= target.getCurrentState().getY() + (target.getHeight() / 2)) {
+                            FingerLine line = new FingerLine(linePX, event.getX(), linePY, event.getY(), 0xFF000000, 10);
+                            target.getDrawings().add(line);
+                            lastLines++;
+                            linePX = event.getX();
+                            linePY = event.getY();
                         }
-
-                        if (prevX == Float.MIN_VALUE) {
-                            prevX = event.getX(1);
-                            Log.d(TAG, "SETTING VAL2");
-                        }
-
-                        float x1 = event.getX(0);
-                        float y1 = event.getY(0);
-
-                        float x2 = event.getX(1);
-                        float y2 = event.getY(1);
-
-                        float x3 = prevX;
-                        float y3 = prevY;
-
-                        double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1) -
-                                Math.atan2(x3 - x1, y3 - y1));
-
-                        Log.w("WHAT", "" + angle);
-
-                        if(Math.abs(rotate - (int) angle) < target.getMaxRotate()) {
-                            target.setAngle(rotate - (int) angle);
-                        }
-
-
                     } else {
-                        int dx = target.getCurrentState().getX() + (target.getCurrentState().getX() - x);
-                        int dy = target.getCurrentState().getX() + (y - target.getCurrentState().getY());
-                        target.getCurrentState().setX(x);
-                        target.getCurrentState().setY(y);
-                        Log.d(TAG, "ACTION_MOVE");
-                        Log.d(TAG, dx + ":" + dy);
+                        //add half the piece's dimensions so it looks like you're moving them by
+                        //the center instead of the corner
+                        if (event.getPointerCount() == 2) {
+
+                            if (prevY == Float.MIN_VALUE) {
+                                prevY = event.getY(1);
+                                Log.d(TAG, "SETTING VAL1");
+                            }
+
+                            if (prevX == Float.MIN_VALUE) {
+                                prevX = event.getX(1);
+                                Log.d(TAG, "SETTING VAL2");
+                            }
+
+                            float x1 = event.getX(0);
+                            float y1 = event.getY(0);
+
+                            float x2 = event.getX(1);
+                            float y2 = event.getY(1);
+
+                            float x3 = prevX;
+                            float y3 = prevY;
+
+                            double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1) -
+                                    Math.atan2(x3 - x1, y3 - y1));
+
+                            Log.w("WHAT", "" + angle);
+
+                            if (Math.abs(rotate - (int) angle) < target.getMaxRotate()) {
+                                target.setAngle(rotate - (int) angle);
+                            }
+
+
+                        } else {
+                            int dx = target.getCurrentState().getX() + (target.getCurrentState().getX() - x);
+                            int dy = target.getCurrentState().getX() + (y - target.getCurrentState().getY());
+                            target.getCurrentState().setX(x);
+                            target.getCurrentState().setY(y);
+                            Log.d(TAG, "ACTION_MOVE");
+                            Log.d(TAG, dx + ":" + dy);
+                        }
                     }
                 } else {
 
@@ -206,36 +243,45 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 if (pressDuration < MAX_CLICK_DURATION &&
                         distance(pressedX, pressedY, event.getX(), event.getY()) < MAX_CLICK_DISTANCE) {
                     if (target != null) {
-                        Log.d(TAG, "ACTION_UP_CLICK");
-                        int newImageIndex = target.getNextImageIndex();
-                        Map<String, Object> newState = new HashMap<>();
-                        newState.put("currentImageIndex", newImageIndex);
-                        Log.d(TAG, "Updating image index to " + newImageIndex);
-                        FirebaseDatabase.getInstance().getReference(
-                                "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
-                                        "/pieces/" + target.getPieceIndex() + "/currentState")
-                                .updateChildren(newState);
-                        target = null;
+                        if(draw) {
+                            Log.d(TAG, "dot");
+                            target = null;
+                        } else {
+                            Log.d(TAG, "ACTION_UP_CLICK");
+                            int newImageIndex = target.getNextImageIndex();
+                            Map<String, Object> newState = new HashMap<>();
+                            newState.put("currentImageIndex", newImageIndex);
+                            Log.d(TAG, "Updating image index to " + newImageIndex);
+                            FirebaseDatabase.getInstance().getReference(
+                                    "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                            "/pieces/" + target.getPieceIndex() + "/currentState")
+                                    .updateChildren(newState);
+                            target = null;
+                        }
                     }
                 }
                 // Drag event
                 else {
                     if (target != null && event.getPointerCount() == 1) {
-                        Log.d(TAG, "ACTION_UP_DRAG");
-                        Map<String, Object> loc = new HashMap<>();
-                        double nX = x;
-                        double nY = y;
-                        int newX = (int) (nX / (double) mGame.getBoard().getWidth() * 100);
-                        int newY = (int) (nY / (double) mGame.getBoard().getHeight() * 100);
-                        loc.put("x", newX);
-                        loc.put("y", newY);
-                        Log.d(TAG, "moving piece to " + newX + ":" + newY);
-                        FirebaseDatabase.getInstance().getReference(
-                                "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
-                                        "/pieces/" + target.getPieceIndex() + "/currentState")
-                                .updateChildren(loc);
-                        Log.d("YO1", target.getPieceElementId() + " x " + target.getCurrentState().getX());
-                        target = null;
+                        if(draw) {
+                            target = null;
+                        } else {
+                            Log.d(TAG, "ACTION_UP_DRAG");
+                            Map<String, Object> loc = new HashMap<>();
+                            double nX = x;
+                            double nY = y;
+                            int newX = (int) (nX / (double) mGame.getBoard().getWidth() * 100);
+                            int newY = (int) (nY / (double) mGame.getBoard().getHeight() * 100);
+                            loc.put("x", newX);
+                            loc.put("y", newY);
+                            Log.d(TAG, "moving piece to " + newX + ":" + newY);
+                            FirebaseDatabase.getInstance().getReference(
+                                    "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                            "/pieces/" + target.getPieceIndex() + "/currentState")
+                                    .updateChildren(loc);
+                            Log.d("YO1", target.getPieceElementId() + " x " + target.getCurrentState().getX());
+                            target = null;
+                        }
                     } else {
                         Log.d(TAG, "LIFTED UP A POINTER");
                     }
@@ -262,4 +308,23 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         return px / getResources().getDisplayMetrics().density;
     }
 
+    @Override
+    public void onClick(View view) {
+        int v = view.getId();
+        if(v == R.id.drawButton) {
+            if(draw) {
+                findViewById(R.id.drawButton).setBackgroundColor(0xFFFF5733);
+            } else {
+                findViewById(R.id.drawButton).setBackgroundColor(0xFF90cc8e);
+            }
+            draw = !draw;
+        } else if(v == R.id.undoButton) {
+            if(lastLinesTarget != null) {
+                for(int i = 0; i < lastLines; i ++) {
+                    Log.d(TAG, "Removing lines");
+                    lastLinesTarget.getDrawings().remove(lastLinesTarget.getDrawings().size() - 1);
+                }
+            }
+        }
+    }
 }
