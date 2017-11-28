@@ -328,7 +328,11 @@ public class GamePiece implements IGameElement, Comparable {
         Bitmap drawNotif = Bitmap.createScaledBitmap(drawingImg, 200, 200, true);
 
         Log.d(TAG, "" +drawingImg.getWidth());
-        canvas.drawBitmap(drawingImg, (currentState.getX()), (currentState.getY()), null);
+        matrix.reset();
+        matrix.postTranslate(-drawNotif.getWidth() / 2, -drawNotif.getHeight() / 2); // Centers image
+        matrix.postRotate(angle);
+        matrix.postTranslate(currentState.getX(), currentState.getY());
+        canvas.drawBitmap(drawNotif, matrix, null);
 
         for (int i = 0; i < drawings.size(); i++) {
             if (drawings.get(i).getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
