@@ -364,8 +364,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                         } else {
                             Log.d(TAG, "ACTION_UP_DRAG");
                             Map<String, Object> loc = new HashMap<>();
-                            double nX = x;
-                            double nY = y;
+                            double nX = x - (target.getWidth()/2);
+                            double nY = y - (target.getHeight()/2);
                             int newX = (int) (nX / (double) mGame.getBoard().getWidth() * 100);
                             int newY = (int) (nY / (double) mGame.getBoard().getHeight() * 100);
                             loc.put("x", newX);
