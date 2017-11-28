@@ -327,7 +327,7 @@ public class GamePiece implements IGameElement, Comparable {
         Bitmap drawingImg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drawing, options);
 
         Log.d(TAG, "" +drawingImg.getWidth());
-        canvas.drawBitmap(drawingImg, (currentState.getX() - mWidth/2), (currentState.getY() - mHeight/2), null);
+        canvas.drawBitmap(drawingImg, currentState.getX(), currentState.getY(), null);
 
         for (int i = 0; i < drawings.size(); i++) {
             if (drawings.get(i).getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
