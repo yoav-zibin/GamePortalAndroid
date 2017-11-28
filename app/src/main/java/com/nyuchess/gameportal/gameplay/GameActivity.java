@@ -420,6 +420,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 GamePiece ref = historyRef.get(historyRef.size() - 1);
                 for(int i = 0; i < tbr; i ++) {
                     Log.d(TAG, "Removing lines");
+                    mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                            "/pieces/" + ref.getPieceIndex() + "/currentState/drawing").child(ref.getDrawings().get(ref.getDrawings().size() - 1).getPushId()).removeValue();
                     ref.getDrawings().remove(ref.getDrawings().size() - 1);
                 }
                 history.remove(history.size() - 1);
