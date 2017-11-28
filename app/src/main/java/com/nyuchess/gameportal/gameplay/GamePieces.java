@@ -1,5 +1,7 @@
 package com.nyuchess.gameportal.gameplay;
 
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;

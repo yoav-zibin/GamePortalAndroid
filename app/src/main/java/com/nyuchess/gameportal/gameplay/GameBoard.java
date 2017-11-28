@@ -3,6 +3,7 @@ package com.nyuchess.gameportal.gameplay;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -14,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 /**
  * Created by Jordan on 10/14/2017.
@@ -68,26 +70,31 @@ public class GameBoard implements IGameElement {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
-                            Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
-                            long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
-                            Log.d(TAG, "sizeInBytes: " + sizeInBytes);
-
-                            StorageReference storageRef = mStorage.getReference(cloudStoragePath);
-
-                            storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                                @Override
-                                public void onSuccess(byte[] bytes) {
-                                    Log.d(TAG, "Image read success");
-                                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                    finishInit(image, backgroundColor, maxScale);
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    Log.d(TAG, "Game board image read failed: " + exception.getMessage());
-                                }
-                            });
+//                            String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
+//                            Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
+                            String downloadURL = dataSnapshot.child("downloadURL").getValue().toString();
+                            Log.d(TAG, "downloadURL: " + downloadURL);
+                            new DownloadImageTask().execute(downloadURL);
+//                            Bitmap image = ImageLoader.getInstance().loadImageSync(downloadURL);
+//                            finishInit(image, backgroundColor, maxScale);
+//                            long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
+//                            Log.d(TAG, "sizeInBytes: " + sizeInBytes);
+//
+//                            StorageReference storageRef = mStorage.getReference(cloudStoragePath);
+//
+//                            storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+//                                @Override
+//                                public void onSuccess(byte[] bytes) {
+//                                    Log.d(TAG, "Image read success");
+//                                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//                                    finishInit(image, backgroundColor, maxScale);
+//                                }
+//                            }).addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception exception) {
+//                                    Log.d(TAG, "Game board image read failed: " + exception.getMessage());
+//                                }
+//                            });
                         }
 
                         @Override
@@ -104,18 +111,32 @@ public class GameBoard implements IGameElement {
         });
     }
 
+    private class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            return ImageLoader.getInstance().loadImageSync(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            finishInit(bitmap);
+        }
+    }
+
     //Set the data and set the initialized flag to show we can start drawing
-    private void finishInit(Bitmap image, String backgroundColor, long maxScale){
+//    private void finishInit(Bitmap image, String backgroundColor, long maxScale){
+    private void finishInit(Bitmap image){
         //get actual image using id
         Log.d(TAG, "finishInit");
         this.image = image;
         this.mHeight = image.getHeight();
         this.mWidth = image.getWidth();
-        this.backgroundColor = backgroundColor;
-        this.maxScale = maxScale;
+//        this.backgroundColor = backgroundColor;
+//        this.maxScale = maxScale;
 //        Log.d(TAG, "imageId: " + imageId);
-        Log.d(TAG, "backgroundColor " + backgroundColor);
-        Log.d(TAG, "maxScale: " + maxScale);
+//        Log.d(TAG, "backgroundColor " + backgroundColor);
+//        Log.d(TAG, "maxScale: " + maxScale);
         initialized = true;
         Log.d(TAG, "Initialization done");
     }

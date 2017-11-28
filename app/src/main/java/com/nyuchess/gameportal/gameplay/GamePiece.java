@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -18,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +50,7 @@ public class GamePiece implements IGameElement, Comparable {
 
     private long deckPieceIndex;
     private List<Bitmap> images;
+    private int imageCount;
     private String pieceIndex;
     private int mHeight;
     private int mWidth;
@@ -163,36 +166,40 @@ public class GamePiece implements IGameElement, Comparable {
                         }
 
                         maxRotate = (int) (long) (Long) dataSnapshot.child("rotatableDegrees").getValue();
-                        final int imageCount = (int) dataSnapshot.child("images").getChildrenCount();
+                        imageCount = (int) dataSnapshot.child("images").getChildrenCount();
                         for (DataSnapshot imageIdDs : dataSnapshot.child("images").getChildren()) {
                             String imageId = imageIdDs.child("imageId").getValue().toString();
                             mDatabase.getReference("gameBuilder/images/" + imageId).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
-                                    Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
-                                    long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
-                                    Log.d(TAG, "sizeInBytes: " + sizeInBytes);
+                                    String downloadURL = dataSnapshot.child("downloadURL").getValue().toString();
+                                    Log.d(TAG, "downloadURL: " + downloadURL);
+                                    new DownloadImageTask().execute(downloadURL);
 
-                                    StorageReference storageRef = mStorage.getReference(cloudStoragePath);
-                                    storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                                        @Override
-                                        public void onSuccess(byte[] bytes) {
-                                            Log.d(TAG, "Image read success");
-                                            Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                                            images.add(image);
-                                            Log.d(TAG, "got " + images.size() + " images");
-                                            //check to see if all images have been gotten before initializing
-                                            if (images.size() == imageCount) {
-                                                finishInit(images);
-                                            }
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception exception) {
-                                            Log.d(TAG, "Game piece image read failed: " + exception.getMessage());
-                                        }
-                                    });
+//                                    String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
+//                                    Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
+//                                    long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
+//                                    Log.d(TAG, "sizeInBytes: " + sizeInBytes);
+
+//                                    StorageReference storageRef = mStorage.getReference(cloudStoragePath);
+//                                    storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+//                                        @Override
+//                                        public void onSuccess(byte[] bytes) {
+//                                            Log.d(TAG, "Image read success");
+//                                            Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//                                            images.add(image);
+//                                            Log.d(TAG, "got " + images.size() + " images");
+//                                            //check to see if all images have been gotten before initializing
+//                                            if (images.size() == imageCount) {
+//                                                finishInit(images);
+//                                            }
+//                                        }
+//                                    }).addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception exception) {
+//                                            Log.d(TAG, "Game piece image read failed: " + exception.getMessage());
+//                                        }
+//                                    });
                                 }
 
                                 @Override
@@ -209,6 +216,24 @@ public class GamePiece implements IGameElement, Comparable {
                     }
                 });
 
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            return ImageLoader.getInstance().loadImageSync(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            images.add(bitmap);
+            Log.d(TAG, "got " + images.size() + " images");
+            //check to see if all images have been gotten before initializing
+            if (images.size() == imageCount) {
+                finishInit(images);
+            }
+        }
     }
 
     private void finishInit(List<Bitmap> images) {
