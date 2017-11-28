@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -27,6 +28,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -68,9 +70,12 @@ public class GamePiece implements IGameElement, Comparable {
     private boolean canSee = false;
     private int maxRotate;
 
+    private double seconds = 0.0;
+    private boolean running = false;
+
     private Activity activity;
 
-    private TextView drawing;
+    private boolean drawing;
 
     private ArrayList<FingerLine> drawings;
 
@@ -97,8 +102,8 @@ public class GamePiece implements IGameElement, Comparable {
         images = new ArrayList<>();
         drawings = new ArrayList<>();
         this.activity = activity;
-        drawing = new TextView(activity);
         activity.getResources();
+        drawing = false;
     }
 
     void startInit(DataSnapshot dataSnapshot) {
@@ -251,7 +256,9 @@ public class GamePiece implements IGameElement, Comparable {
                                 }
                                 if (dataSnapshot.child("currentState").child("drawing") != null) {
                                     drawings = new ArrayList<>();
+                                    int numChild = 0;
                                     for (DataSnapshot child : dataSnapshot.child("currentState").child("drawing").getChildren()) {
+                                        numChild++;
                                         if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(child.child("userId").getValue())) {
                                             Log.d(TAG, "CHILD IS HERE");
                                             Log.d(TAG, child.toString());
@@ -264,9 +271,13 @@ public class GamePiece implements IGameElement, Comparable {
                                                     Integer.parseInt(child.child("toY").getValue().toString()),
                                                     (int) Long.parseLong("FF" + child.child("color").getValue().toString(), 16),
                                                     Integer.parseInt(child.child("lineThickness").getValue().toString()), child.getKey()));
+                                        } else if(initialized && ((int) dataSnapshot.child("currentState").child("drawing").getChildrenCount() == numChild)) {
+                                            drawing = true;
+                                            seconds = System.currentTimeMillis();
                                         }
                                     }
                                 }
+
                                 int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
                                         .child("x").getValue().toString())) / 100 * widthScreen) + (mWidth/2);
                                 int y = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
@@ -323,16 +334,21 @@ public class GamePiece implements IGameElement, Comparable {
         matrix.postTranslate(currentState.getX(), currentState.getY());
         canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()), matrix, null);
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        Bitmap drawingImg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drawing, options);
-        Bitmap drawNotif = Bitmap.createScaledBitmap(drawingImg, 200, 200, true);
+        if(drawing) {
 
-        Log.d(TAG, "" +drawingImg.getWidth());
-        matrix.reset();
-        matrix.postTranslate(-drawNotif.getWidth() / 2, -drawNotif.getHeight() / 2); // Centers image
-        matrix.postRotate(angle);
-        matrix.postTranslate(currentState.getX(), currentState.getY());
-        canvas.drawBitmap(drawNotif, matrix, null);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap drawingImg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drawing, options);
+            Bitmap drawNotif = Bitmap.createScaledBitmap(drawingImg, 200, 200, true);
+
+            matrix.reset();
+            matrix.postTranslate(-drawNotif.getWidth() / 2, -drawNotif.getHeight() / 2); // Centers image
+            matrix.postRotate(angle);
+            matrix.postTranslate(currentState.getX(), currentState.getY());
+            canvas.drawBitmap(drawNotif, matrix, null);
+            if(System.currentTimeMillis() - seconds > 3000) {
+                drawing = false;
+            }
+        }
 
         for (int i = 0; i < drawings.size(); i++) {
             if (drawings.get(i).getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
@@ -349,6 +365,14 @@ public class GamePiece implements IGameElement, Comparable {
         //Log.v(TAG, "drawing piece " + pieceElementId + " at x:y " + currentState.getX() + ":" + currentState.getY());
         //canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()),
         //      currentState.getX(), currentState.getY(), null);
+    }
+
+    public boolean getDrawing() {
+        return drawing;
+    }
+
+    public void setDrawing(boolean draw) {
+        drawing = draw;
     }
 
     public String getGroupId() {
