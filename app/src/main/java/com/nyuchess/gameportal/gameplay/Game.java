@@ -1,5 +1,6 @@
 package com.nyuchess.gameportal.gameplay;
 
+import android.app.Activity;
 import android.graphics.Canvas;
 import android.util.Log;
 
@@ -18,10 +19,12 @@ public class Game {
     private GamePieces mGamePieces;
     private GameBoard mGameBoard;
 
-    Game(String gameId, String matchId, String groupId){
+    private Activity activity;
+
+    Game(String gameId, String matchId, String groupId, Activity activity){
         mGameId = gameId;
         mGameBoard = new GameBoard(gameId);
-        mGamePieces = new GamePieces(gameId, matchId, groupId);
+        mGamePieces = new GamePieces(gameId, matchId, groupId, activity);
     }
 
     void init(){

@@ -1,5 +1,6 @@
 package com.nyuchess.gameportal.gameplay;
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -25,12 +26,15 @@ class GamePieces extends ArrayList<GamePiece> {
     private String mGroupId;
     private String mGameId;
 
-    GamePieces(String gameId, String MatchId, String GroupId){
+    private Activity activity;
+
+    GamePieces(String gameId, String MatchId, String GroupId, Activity activity){
         super();
         Log.d(TAG, "constructor");
         mMatchId = MatchId;
         mGroupId = GroupId;
         mGameId = gameId;
+        this.activity = activity;
     }
 
     void init(){
@@ -48,7 +52,7 @@ class GamePieces extends ArrayList<GamePiece> {
                         Log.d(TAG, mGameId);
                         for (DataSnapshot piece: dataSnapshot.getChildren()) {
 //                            add(getGamePiece(piece));
-                            GamePiece gamePiece = new GamePiece(mGameId, mMatchId, mGroupId);
+                            GamePiece gamePiece = new GamePiece(mGameId, mMatchId, mGroupId, activity);
                             gamePiece.startInit(piece);
                             add(gamePiece);
                         }

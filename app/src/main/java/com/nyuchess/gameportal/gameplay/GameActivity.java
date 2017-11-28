@@ -88,7 +88,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         gameId = getIntent().getStringExtra(KEY_ID);
         MATCH_ID = getIntent().getStringExtra("MATCH_ID");
         GROUP_ID = getIntent().getStringExtra("GROUP_ID");
-        mGame = new Game(gameId, MATCH_ID, GROUP_ID);
+        mGame = new Game(gameId, MATCH_ID, GROUP_ID, this);
         mGame.init();
         mGameView = findViewById(R.id.game_view);
         mGameView.setGame(mGame);

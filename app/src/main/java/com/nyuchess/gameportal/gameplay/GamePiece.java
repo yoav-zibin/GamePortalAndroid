@@ -1,12 +1,15 @@
 package com.nyuchess.gameportal.gameplay;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -18,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nyuchess.gameportal.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +65,10 @@ public class GamePiece implements IGameElement, Comparable {
     private boolean canSee = false;
     private int maxRotate;
 
+    private Activity activity;
+
+    private TextView drawing;
+
     private ArrayList<FingerLine> drawings;
 
     public PieceState getInitialState() {
@@ -77,7 +85,7 @@ public class GamePiece implements IGameElement, Comparable {
     // which players can see this card
     // private int[] cardVisibility;
 
-    GamePiece(String gameId, String matchId, String groupId) {
+    GamePiece(String gameId, String matchId, String groupId, Activity activity) {
         initialized = false;
         mGroupId = groupId;
         mMatchId = matchId;
@@ -85,6 +93,9 @@ public class GamePiece implements IGameElement, Comparable {
         angle = 0;
         images = new ArrayList<>();
         drawings = new ArrayList<>();
+        this.activity = activity;
+        drawing = new TextView(activity);
+        activity.getResources();
     }
 
     void startInit(DataSnapshot dataSnapshot) {
@@ -257,9 +268,9 @@ public class GamePiece implements IGameElement, Comparable {
                                     }
                                 }
                                 int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
-                                        .child("x").getValue().toString())) / 100 * widthScreen);
+                                        .child("x").getValue().toString())) / 100 * widthScreen) + (mWidth/2);
                                 int y = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
-                                        .child("y").getValue().toString())) / 100 * heightScreen);
+                                        .child("y").getValue().toString())) / 100 * heightScreen) + (mHeight/2);
                                 int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
                                 int currentImageIndex = currentState.getCurrentImageIndex();
                                 if (type.equals("card") && canSee) {
@@ -311,6 +322,12 @@ public class GamePiece implements IGameElement, Comparable {
         matrix.postRotate(angle);
         matrix.postTranslate(currentState.getX(), currentState.getY());
         canvas.drawBitmap(images.get(currentState.getCurrentImageIndex()), matrix, null);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap drawingImg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.drawing, options);
+
+        Log.d(TAG, "" +drawingImg.getWidth());
+        canvas.drawBitmap(drawingImg, (currentState.getX() - mWidth/2), (currentState.getY() - mHeight/2), null);
 
         for (int i = 0; i < drawings.size(); i++) {
             if (drawings.get(i).getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
