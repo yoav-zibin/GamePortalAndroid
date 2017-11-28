@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nyuchess.gameportal.R;
 import com.nyuchess.gameportal.groups.User;
 
@@ -118,6 +121,14 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 setFontSize(seekBar.getProgress());
             }
         });
+
+        //set image loader to cache images by default
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true).cacheOnDisk(true).build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+           .defaultDisplayImageOptions(defaultOptions)
+           .build();
+        ImageLoader.getInstance().init(config);
     }
 
     public void setFontSize(int x) {
