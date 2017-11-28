@@ -254,6 +254,10 @@ public class GamePiece implements IGameElement, Comparable {
                                         }
                                     }
                                 }
+                                if (dataSnapshot.child("currentState").child("rotationDegrees") != null &&
+                                        dataSnapshot.child("currentState").child("rotationDegrees").getValue() != null) {
+                                    angle = Integer.parseInt(dataSnapshot.child("currentState").child("rotationDegrees").getValue().toString());
+                                }
                                 if (dataSnapshot.child("currentState").child("drawing") != null) {
                                     drawings = new ArrayList<>();
                                     int numChild = 0;

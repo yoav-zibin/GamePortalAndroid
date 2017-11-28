@@ -288,10 +288,26 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1) -
                                     Math.atan2(x3 - x1, y3 - y1));
 
-                            Log.w("WHAT", "" + angle);
+                            //Log.w("WHAT", "" + angle);
 
-                            if (Math.abs(rotate - (int) angle) < target.getMaxRotate()) {
-                                target.setAngle(rotate - (int) angle);
+                            if(angle < 0) {
+                                //angle += 360;
+                            }
+
+                            int check = (rotate - (int) angle);
+                            while(check < 0) {
+                                check += 360;
+                            }
+
+                            Log.w(TAG, "" + check);
+
+                            if (check < target.getMaxRotate()) {
+                                target.setAngle(check);
+                                DatabaseReference ref = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                        "/pieces/" + target.getPieceIndex() + "/currentState");
+                                Map<String, Object> degrees = new HashMap<>();
+                                degrees.put("rotationDegrees", check);
+                                ref.updateChildren(degrees);
                             }
 
 
