@@ -70,31 +70,9 @@ public class GameBoard implements IGameElement {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
-//                            String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
-//                            Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
                             String downloadURL = dataSnapshot.child("downloadURL").getValue().toString();
                             Log.d(TAG, "downloadURL: " + downloadURL);
                             new DownloadImageTask().execute(downloadURL);
-//                            Bitmap image = ImageLoader.getInstance().loadImageSync(downloadURL);
-//                            finishInit(image, backgroundColor, maxScale);
-//                            long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
-//                            Log.d(TAG, "sizeInBytes: " + sizeInBytes);
-//
-//                            StorageReference storageRef = mStorage.getReference(cloudStoragePath);
-//
-//                            storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-//                                @Override
-//                                public void onSuccess(byte[] bytes) {
-//                                    Log.d(TAG, "Image read success");
-//                                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//                                    finishInit(image, backgroundColor, maxScale);
-//                                }
-//                            }).addOnFailureListener(new OnFailureListener() {
-//                                @Override
-//                                public void onFailure(@NonNull Exception exception) {
-//                                    Log.d(TAG, "Game board image read failed: " + exception.getMessage());
-//                                }
-//                            });
                         }
 
                         @Override

@@ -1,7 +1,5 @@
 package com.nyuchess.gameportal.gameplay;
 
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -10,9 +8,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Created by Jordan on 10/23/2017.

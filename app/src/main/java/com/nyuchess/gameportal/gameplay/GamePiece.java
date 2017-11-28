@@ -175,31 +175,6 @@ public class GamePiece implements IGameElement, Comparable {
                                     String downloadURL = dataSnapshot.child("downloadURL").getValue().toString();
                                     Log.d(TAG, "downloadURL: " + downloadURL);
                                     new DownloadImageTask().execute(downloadURL);
-
-//                                    String cloudStoragePath = dataSnapshot.child("cloudStoragePath").getValue().toString();
-//                                    Log.d(TAG, "cloudStoragePath: " + cloudStoragePath);
-//                                    long sizeInBytes = (Long) dataSnapshot.child("sizeInBytes").getValue();
-//                                    Log.d(TAG, "sizeInBytes: " + sizeInBytes);
-
-//                                    StorageReference storageRef = mStorage.getReference(cloudStoragePath);
-//                                    storageRef.getBytes(sizeInBytes).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-//                                        @Override
-//                                        public void onSuccess(byte[] bytes) {
-//                                            Log.d(TAG, "Image read success");
-//                                            Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//                                            images.add(image);
-//                                            Log.d(TAG, "got " + images.size() + " images");
-//                                            //check to see if all images have been gotten before initializing
-//                                            if (images.size() == imageCount) {
-//                                                finishInit(images);
-//                                            }
-//                                        }
-//                                    }).addOnFailureListener(new OnFailureListener() {
-//                                        @Override
-//                                        public void onFailure(@NonNull Exception exception) {
-//                                            Log.d(TAG, "Game piece image read failed: " + exception.getMessage());
-//                                        }
-//                                    });
                                 }
 
                                 @Override
