@@ -17,7 +17,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_toEndOf="@+id/textView3"
+        android:layout_toRightOf="@+id/textView3"
         android:background="#FF5733"
         android:text="Draw on cards" />
 
@@ -81,5 +82,17 @@
         android:ems="10"
         android:hint="000000"
         android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/clearButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@+id/hexColor"
+        android:layout_toRightOf="@+id/hexColor"
+        android:background="#FF5733"
+        android:text="Clear all drawings" />
 
 </RelativeLayout>

@@ -9,10 +9,11 @@ import com.google.firebase.auth.FirebaseAuth;
 public class FingerLine {
     private float fromX, toX, fromY, toY, thickness;
     private int color;
-    private String userId;
+    private String userId, pushId;
 
-    public FingerLine(float fromX, float toX, float fromY, float toY, int color, float thickness) {
+    public FingerLine(float fromX, float toX, float fromY, float toY, int color, float thickness, String pushId) {
         this.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        this.pushId = pushId;
         this.fromX = fromX;
         this.toX = toX;
         this.fromY = fromY;
@@ -61,5 +62,9 @@ public class FingerLine {
     public void changeYBy (int dy) {
         this.fromY += dy;
         this.toY += dy;
+    }
+
+    public String getPushId() {
+        return pushId;
     }
 }

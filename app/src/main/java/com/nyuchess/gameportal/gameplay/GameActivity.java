@@ -15,6 +15,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     private int rotate;
 
     private boolean draw;
+    private boolean clear;
 
     //the piece currently being acted on with a touch event, if any
     private GamePiece target;
@@ -92,10 +94,12 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         mGameView.setGame(mGame);
         mGameView.setOnTouchListener(this);
         draw = false;
+        clear = false;
         history = new ArrayList<>();
         historyRef = new ArrayList<>();
         findViewById(R.id.drawButton).setOnClickListener(this);
         findViewById(R.id.undoButton).setOnClickListener(this);
+        findViewById(R.id.clearButton).setOnClickListener(this);
         SeekBar fontSize = (SeekBar) findViewById(R.id.fontSize);
         fontSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -199,22 +203,49 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
+                if(clear) {
+                    break;
+                } else
                 //if a piece is being dragged, move it
                 if (target != null) {
                     if(draw) {
-                        Log.d(TAG, "Trying to draw");
                         if(x <= target.getCurrentState().getX() + (target.getWidth() / 2)
                                 && x >= target.getCurrentState().getX() - (target.getWidth() / 2)
                                 && y >= target.getCurrentState().getY() - (target.getHeight() / 2)
                                 && y <= target.getCurrentState().getY() + (target.getHeight() / 2)) {
+                            Log.d(TAG, "Trying to draw");
+                            Log.d(TAG, event.getX() + " " + event.getY());
                             EditText getColor = (EditText)findViewById(R.id.hexColor);
                             String color = getColor.getText().toString();
                             if(color.length() != 6) {
                                 color = "000000";
                             }
+                            DatabaseReference ref = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                    "/pieces/" + target.getPieceIndex() + "/currentState/drawing/");
+                            String push = ref.push().toString().replace("https://universalgamemaker.firebaseio.com/gamePortal/groups/" +
+                                    GROUP_ID + "/matches/" + MATCH_ID + "/pieces/" + target.getPieceIndex() + "/currentState/drawing/", "");
                             int hex = (int) Long.parseLong("FF" + color, 16);
-                            FingerLine line = new FingerLine(linePX, event.getX(), linePY, event.getY(), hex, fontSize);
+                            float fromX = (linePX - target.getCurrentState().getX() + (target.getWidth()/2)) * 100 / target.getWidth();
+                            float toX = (x - target.getCurrentState().getX() + (target.getWidth()/2)) * 100 / target.getWidth();
+                            float fromY = (linePY - target.getCurrentState().getY() + (target.getHeight()/2)) * 100 / target.getHeight();
+                            float toY = (y - target.getCurrentState().getY() + (target.getHeight()/2)) * 100 / target.getHeight();
+                            FingerLine line = new FingerLine(fromX, toX, fromY, toY, hex, fontSize, push);
+
+                            Map<String, Object> draw = new HashMap<>();
+                            draw.put("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            draw.put("timestamp", ServerValue.TIMESTAMP);
+                            draw.put("color", color);
+                            draw.put("lineThickness", fontSize);
+                            draw.put("fromX", (int) fromX);
+                            draw.put("fromY", (int) fromY);
+                            draw.put("toX", (int) toX);
+                            draw.put("toY", (int) toY);
+
+                            ref.push().setValue(draw);
+
                             target.getDrawings().add(line);
+                            Log.d(TAG, target.getDrawings().size() + "");
+                            Log.d(TAG, line.getFromX() + "");
                             lastLines++;
                             linePX = event.getX();
                             linePY = event.getY();
@@ -260,10 +291,10 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             target.getCurrentState().setY(target.getCurrentState().getY() + dy);
                             Log.d(TAG, "ACTION_MOVE");
 
-                            for(int i = 0; i < target.getDrawings().size(); i++) {
+                            /*for(int i = 0; i < target.getDrawings().size(); i++) {
                                 target.getDrawings().get(i).changeXBy(dx);
                                 target.getDrawings().get(i).changeYBy(dy);
-                            }
+                            } */
                             //Log.d(TAG, dx + ":" + dy);
                         }
                     }
@@ -280,7 +311,19 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 view.performClick();
                 long pressDuration = System.currentTimeMillis() - pressStartTime;
                 // Click event
-                if (pressDuration < MAX_CLICK_DURATION &&
+                if(clear) {
+                    if(target != null) {
+                        DatabaseReference ref = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                "/pieces/" + target.getPieceIndex() + "/currentState/drawing");
+                        if(target.getDrawings().size() > 0) {
+                            history = new ArrayList<>();
+                            historyRef = new ArrayList<>();
+                        }
+                        for(int i = 0; i < target.getDrawings().size(); i++) {
+                            ref.child(target.getDrawings().get(i).getPushId()).removeValue();
+                        }
+                    }
+                } else if (pressDuration < MAX_CLICK_DURATION &&
                         distance(pressedX, pressedY, event.getX(), event.getY()) < MAX_CLICK_DISTANCE) {
                     if (target != null) {
                         if(draw) {
@@ -358,8 +401,19 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 findViewById(R.id.drawButton).setBackgroundColor(0xFFFF5733);
             } else {
                 findViewById(R.id.drawButton).setBackgroundColor(0xFF90cc8e);
+                findViewById(R.id.clearButton).setBackgroundColor(0xFFFF5733);
+                clear = false;
             }
             draw = !draw;
+        } else if(v == R.id.clearButton) {
+            if(clear) {
+                findViewById(R.id.clearButton).setBackgroundColor(0xFFFF5733);
+            } else {
+                findViewById(R.id.clearButton).setBackgroundColor(0xFF90cc8e);
+                findViewById(R.id.drawButton).setBackgroundColor(0xFFFF5733);
+                draw = false;
+            }
+            clear = !clear;
         } else if(v == R.id.undoButton) {
             if(history.size() > 0) {
                 int tbr = history.get(history.size() - 1);
