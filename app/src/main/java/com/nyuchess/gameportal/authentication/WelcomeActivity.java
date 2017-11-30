@@ -93,11 +93,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         Log.d(TAG, mAuth.getCurrentUser().getProviderId());
         Log.d(TAG, "OI OI OI");
 
-        Map<String, Object> fields = new HashMap<>();
-        fields.put("publicFields", pub);
-        fields.put("privateFields", priv);
-
-        ref.child(mAuth.getCurrentUser().getUid()).updateChildren(fields);
+        ref.child(mAuth.getCurrentUser().getUid() + "/privateFields").updateChildren(priv);
+        ref.child(mAuth.getCurrentUser().getUid() + "/publicFields").updateChildren(pub);
 
         username = mAuth.getCurrentUser().getDisplayName();
         mWelcomeTextView.setText("Welcome, " + pub.get("displayName"));
