@@ -19,12 +19,12 @@
         android:id="@+id/sign_out"
         android:layout_width="125dp"
         android:layout_height="70dp"
+        android:layout_alignLeft="@+id/group_button"
+        android:layout_alignStart="@+id/group_button"
         android:layout_below="@+id/welcome"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="13dp"
         android:background="#7aa0c2"
-        android:textSize="15sp"
-        android:text="SIGN OUT" />
+        android:text="SIGN OUT"
+        android:textSize="15sp" />
 
     <!--<Button-->
     <!--android:id="@+id/view_online_users"-->
@@ -77,6 +77,18 @@
         android:layout_marginTop="42dp"
         android:textSize="30sp"
         android:text="Start A Match" />
+
+    <Button
+        android:id="@+id/friendsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/users_online"
+        android:layout_alignEnd="@+id/people_button"
+        android:layout_alignLeft="@+id/people_button"
+        android:layout_alignRight="@+id/people_button"
+        android:layout_alignStart="@+id/people_button"
+        android:layout_below="@+id/welcome"
+        android:text="Friends" />
 
 
 </RelativeLayout>

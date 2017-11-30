@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nyuchess.gameportal">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -12,12 +12,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="GamePortalAndroid" />
         <activity android:name=".authentication.MainActivity">
             <intent-filter>
@@ -42,7 +43,8 @@
         <activity android:name=".gameplay.GameActivity" />
         <activity android:name=".groups.MatchActivity" />
         <activity android:name=".groups.GroupActivity" />
-        <activity android:name=".groups.MatchesListActivity"></activity>
+        <activity android:name=".groups.MatchesListActivity" />
+        <activity android:name=".groups.FriendsActivity"></activity>
     </application>
 
 </manifest>

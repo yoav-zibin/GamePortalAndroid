@@ -21,6 +21,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.nyuchess.gameportal.R;
 import com.nyuchess.gameportal.chat.ChatsListActivity;
+import com.nyuchess.gameportal.groups.FriendsActivity;
 import com.nyuchess.gameportal.groups.UsersActivity;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.nyuchess.gameportal.groups.MatchActivity;
@@ -59,6 +60,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.people_button).setOnClickListener(this);
         findViewById(R.id.sign_out).setOnClickListener(this);
         findViewById(R.id.start_match).setOnClickListener(this);
+        findViewById(R.id.friendsButton).setOnClickListener(this);
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -117,6 +119,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         } else if(i == R.id.start_match) {
             Intent intent = new Intent(this, MatchActivity.class);
             intent.putExtra("QUICKSTART", "true");
+            startActivity(intent);
+        } else if(i == R.id.friendsButton) {
+            Intent intent = new Intent(this, FriendsActivity.class);
             startActivity(intent);
         }
     }

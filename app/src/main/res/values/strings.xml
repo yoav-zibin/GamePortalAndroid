@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">GamePortal</string>
     <string name="title_activity_anonymous_login">AnonymousLoginActivity</string>
-    <string name="twitter_consumer_key">MMCwEorIF5xEEkUv2cs76oWOg</string>
-    <string name="twitter_consumer_secret">Z6oCMOHHgOKnJa97VE8mK0yRfLq0KiXUs4zw1I00Dn1I1RoswL</string>
-    <string name="facebook_app_id">118671355514402</string>
+    <string name="twitter_consumer_key">UBDJE3aZ8HAyleWhMrj63W5IX</string>
+    <string name="twitter_consumer_secret">vyGYOlqrpDaaYavTzILjuYsOyRYeLzD8fqGpfLKPQZv7CZsOjM</string>
+    <string name="facebook_app_id">108663313217881</string>
     <string name="fb_login_protocol_scheme">fb118671355514402</string>
 </resources>
