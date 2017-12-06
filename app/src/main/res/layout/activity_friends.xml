@@ -11,6 +11,7 @@
     android:layout_height="match_parent"
     tools:context="com.nyuchess.gameportal.groups.FriendsActivity"
     android:layout_above="@+id/addFriends"
+    android:layout_marginBottom="5dp"
     android:orientation="vertical">
 
     <LinearLayout
@@ -60,8 +61,9 @@
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="#FF5733"
-        android:text="Add Friends"
+        android:background="@drawable/findfriendsbutton"
+        android:text="Find Friends"
+        android:layout_marginBottom="10dp"
         android:textSize="15sp" />
 
 </RelativeLayout>

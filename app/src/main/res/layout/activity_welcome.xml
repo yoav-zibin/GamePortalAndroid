@@ -90,6 +90,7 @@
         android:layout_alignStart="@+id/people_button"
         android:layout_below="@+id/welcome"
         android:background="@drawable/friendsbutton"
+        android:textSize="15sp"
         android:text="Friends" />
 
 

@@ -20,6 +20,8 @@
         android:layout_toEndOf="@+id/textView3"
         android:layout_toRightOf="@+id/textView3"
         android:background="#FF5733"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="Draw on cards" />
 
     <Button
@@ -29,7 +31,9 @@
         android:layout_above="@+id/drawButton"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:background="#FF00FF"
+        android:background="@drawable/undobutton"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
         android:text="Undo" />
 
     <SeekBar
@@ -93,6 +97,8 @@
         android:layout_toEndOf="@+id/hexColor"
         android:layout_toRightOf="@+id/hexColor"
         android:background="#FF5733"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="Clear all drawings" />
 
 </RelativeLayout>

@@ -27,7 +27,7 @@
         android:layout_marginStart="28dp"
         android:layout_marginTop="42dp"
         android:textSize="20sp"
-        android:background="#90cc8e"
+        android:background="@drawable/usersbutton"
         android:text="Chat" />
 
     <Button
@@ -40,14 +40,14 @@
         android:layout_marginEnd="28dp"
         android:layout_marginRight="28dp"
         android:textSize="20sp"
-        android:background="#90cc8e"
+        android:background="@drawable/groupsbutton"
         android:text="Matches" />
 
     <Button
         android:id="@+id/addPpl"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:background="#FF5733"
+        android:background="@drawable/startamatchbutton"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="55dp"
@@ -60,6 +60,6 @@
         android:layout_below="@+id/chat_button"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="41dp"
-        android:background="#7aa0c2"
+        android:background="@drawable/seegroupiesbutton"
         android:text="See Groupies" />
 </RelativeLayout>

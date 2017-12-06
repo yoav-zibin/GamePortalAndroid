@@ -6,7 +6,6 @@
                 android:topLeftRadius="30dip"
                 android:bottomRightRadius="30dip"
                 />
-            <stroke android:width="1dip" android:color="#5e7974" />
             <gradient android:angle="225" android:startColor="#90cc8e" android:endColor="#248f24"  />
         </shape>
     </item>
@@ -16,7 +15,6 @@
                 android:topLeftRadius="30dip"
                 android:bottomRightRadius="30dip"
                 />
-            <stroke android:width="1dip" android:color="#5e7974" />
             <solid android:color="#90cc8e"/>
         </shape>
     </item>
@@ -26,7 +24,6 @@
                 android:topLeftRadius="30dip"
                 android:bottomRightRadius="30dip"
                 />
-            <stroke android:width="1dip" android:color="#5e7974" />
             <gradient android:angle="225" android:startColor="#99ff99" android:endColor="#90cc8e" />
         </shape>
     </item>
