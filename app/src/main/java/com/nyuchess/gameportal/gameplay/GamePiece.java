@@ -69,6 +69,7 @@ public class GamePiece implements IGameElement, Comparable {
     private int widthScreen = 1;
     private boolean canSee = false;
     private int maxRotate;
+    private int numDraw;
 
     private double seconds = 0.0;
     private boolean running = false;
@@ -104,6 +105,7 @@ public class GamePiece implements IGameElement, Comparable {
         this.activity = activity;
         activity.getResources();
         drawing = false;
+        numDraw = 0;
     }
 
     void startInit(DataSnapshot dataSnapshot) {
@@ -259,10 +261,26 @@ public class GamePiece implements IGameElement, Comparable {
                                     angle = Integer.parseInt(dataSnapshot.child("currentState").child("rotationDegrees").getValue().toString());
                                 }
                                 if (dataSnapshot.child("currentState").child("drawing") != null) {
+                                    if(!initialized) {
+                                        numDraw = (int)dataSnapshot.child("currentState").child("drawing").getChildrenCount();
+                                    } else {
+                                        if(numDraw != (int)dataSnapshot.child("currentState").child("drawing").getChildrenCount()) {
+                                            DataSnapshot lastChild = null;
+                                            for(DataSnapshot child : dataSnapshot.child("currentState").child("drawing").getChildren()) {
+                                                lastChild = child;
+                                            }
+                                            Log.w(TAG, lastChild.toString());
+                                            if(lastChild.child("userId").getValue().toString().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                                numDraw = (int) dataSnapshot.child("currentState").child("drawing").getChildrenCount();
+                                            } else {
+                                                drawing = true;
+                                                seconds = System.currentTimeMillis();
+                                                numDraw = (int) dataSnapshot.child("currentState").child("drawing").getChildrenCount();
+                                            }
+                                        }
+                                    }
                                     drawings = new ArrayList<>();
-                                    int numChild = 0;
                                     for (DataSnapshot child : dataSnapshot.child("currentState").child("drawing").getChildren()) {
-                                        numChild++;
                                         if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(child.child("userId").getValue())) {
                                             Log.d(TAG, "CHILD IS HERE");
                                             Log.d(TAG, child.toString());
@@ -275,9 +293,6 @@ public class GamePiece implements IGameElement, Comparable {
                                                     Integer.parseInt(child.child("toY").getValue().toString()),
                                                     (int) Long.parseLong("FF" + child.child("color").getValue().toString(), 16),
                                                     Integer.parseInt(child.child("lineThickness").getValue().toString()), child.getKey()));
-                                        } else if(initialized && ((int) dataSnapshot.child("currentState").child("drawing").getChildrenCount() == numChild)) {
-                                            drawing = true;
-                                            seconds = System.currentTimeMillis();
                                         }
                                     }
                                 }
@@ -295,6 +310,9 @@ public class GamePiece implements IGameElement, Comparable {
                                 }
                                 updatePreviousState();
                                 currentState.update(x, y, zDepth, currentImageIndex);
+                                if(!initialized) {
+                                    initialized = true;
+                                }
                             }
 
                             @Override
@@ -309,8 +327,6 @@ public class GamePiece implements IGameElement, Comparable {
 
                     }
                 });
-
-        initialized = true;
     }
 
     int getNextImageIndex() {
