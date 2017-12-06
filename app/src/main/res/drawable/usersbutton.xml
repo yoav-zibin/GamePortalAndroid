@@ -27,7 +27,7 @@
                 android:bottomRightRadius="30dip"
                 />
             <stroke android:width="1dip" android:color="#5e7974" />
-            <gradient android:angle="225" android:startColor="#90cc8e" android:endColor="#248f24" />
+            <gradient android:angle="225" android:startColor="#d2ebd1" android:endColor="#90cc8e" />
         </shape>
     </item>
 </selector>

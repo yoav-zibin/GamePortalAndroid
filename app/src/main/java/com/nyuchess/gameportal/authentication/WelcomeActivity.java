@@ -193,6 +193,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 online = new ArrayList<>();
                 Log.d(TAG, " NUMBER USERS " + dataSnapshot.getChildrenCount() + " " + mOnlineViewerCount);
+                int cur = 0;
                 for (final DataSnapshot user: dataSnapshot.getChildren()) {
                     final String userid = (String) user.child("userId").getValue();
                     if(!userid.equals(UID)) {
@@ -224,6 +225,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                             }
                         });
                     }
+
                 }
             }
 
