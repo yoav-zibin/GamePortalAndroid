@@ -13,6 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:text="Welcome" />
 
     <Button
@@ -22,7 +23,7 @@
         android:layout_alignLeft="@+id/group_button"
         android:layout_alignStart="@+id/group_button"
         android:layout_below="@+id/welcome"
-        android:background="@drawable/top_left_bottom_right_round_corners"
+        android:background="@drawable/signoutbutton"
         android:text="SIGN OUT"
         android:textSize="15sp" />
 
@@ -48,7 +49,7 @@
         android:id="@+id/group_button"
         android:layout_width="125dp"
         android:layout_height="125dp"
-        android:background="#90cc8e"
+        android:background="@drawable/groupsbutton"
         android:layout_alignLeft="@+id/start_match"
         android:layout_alignStart="@+id/start_match"
         android:layout_below="@+id/users_online"
@@ -60,7 +61,7 @@
         android:id="@+id/people_button"
         android:layout_width="125dp"
         android:layout_height="125dp"
-        android:background="#90cc8e"
+        android:background="@drawable/usersbutton"
         android:layout_above="@+id/start_match"
         android:layout_alignEnd="@+id/start_match"
         android:layout_alignRight="@+id/start_match"
@@ -71,7 +72,7 @@
         android:id="@+id/start_match"
         android:layout_width="350dp"
         android:layout_height="150dp"
-        android:background="#FF5733"
+        android:background="@drawable/startamatchbutton"
         android:layout_below="@+id/group_button"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="42dp"
@@ -88,6 +89,7 @@
         android:layout_alignRight="@+id/people_button"
         android:layout_alignStart="@+id/people_button"
         android:layout_below="@+id/welcome"
+        android:background="@drawable/friendsbutton"
         android:text="Friends" />
 
 
