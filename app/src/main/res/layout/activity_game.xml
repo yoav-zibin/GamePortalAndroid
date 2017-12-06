@@ -19,9 +19,9 @@
         android:layout_alignParentBottom="true"
         android:layout_toEndOf="@+id/textView3"
         android:layout_toRightOf="@+id/textView3"
-        android:background="#FF5733"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+        android:background="@drawable/drawbuttonoff"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:text="Draw on cards" />
 
     <Button
@@ -96,9 +96,9 @@
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/hexColor"
         android:layout_toRightOf="@+id/hexColor"
-        android:background="#FF5733"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+        android:background="@drawable/drawbuttonoff"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:text="Clear all drawings" />
 
 </RelativeLayout>

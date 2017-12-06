@@ -264,7 +264,7 @@ public class GamePiece implements IGameElement, Comparable {
                                     if(!initialized) {
                                         numDraw = (int)dataSnapshot.child("currentState").child("drawing").getChildrenCount();
                                     } else {
-                                        if(numDraw != (int)dataSnapshot.child("currentState").child("drawing").getChildrenCount()) {
+                                        if(numDraw < (int)dataSnapshot.child("currentState").child("drawing").getChildrenCount()) {
                                             DataSnapshot lastChild = null;
                                             for(DataSnapshot child : dataSnapshot.child("currentState").child("drawing").getChildren()) {
                                                 lastChild = child;
@@ -278,6 +278,7 @@ public class GamePiece implements IGameElement, Comparable {
                                                 numDraw = (int) dataSnapshot.child("currentState").child("drawing").getChildrenCount();
                                             }
                                         }
+                                        numDraw = (int) dataSnapshot.child("currentState").child("drawing").getChildrenCount();
                                     }
                                     drawings = new ArrayList<>();
                                     for (DataSnapshot child : dataSnapshot.child("currentState").child("drawing").getChildren()) {

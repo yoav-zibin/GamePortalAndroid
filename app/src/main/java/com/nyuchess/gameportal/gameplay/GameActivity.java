@@ -1,6 +1,7 @@
 package com.nyuchess.gameportal.gameplay;
 
 import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -425,20 +426,40 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
     public void onClick(View view) {
         int v = view.getId();
         if(v == R.id.drawButton) {
+            final int sdk = android.os.Build.VERSION.SDK_INT;
             if(draw) {
-                findViewById(R.id.drawButton).setBackgroundColor(0xFFFF5733);
+                if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(R.id.drawButton).setBackgroundDrawable(getResources().getDrawable(R.drawable.drawbuttonoff));
+                } else {
+                    findViewById(R.id.drawButton).setBackground(getResources().getDrawable(R.drawable.drawbuttonoff));
+                }
             } else {
-                findViewById(R.id.drawButton).setBackgroundColor(0xFF90cc8e);
-                findViewById(R.id.clearButton).setBackgroundColor(0xFFFF5733);
+                if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(R.id.clearButton).setBackgroundDrawable(getResources().getDrawable(R.drawable.drawbuttonoff));
+                    findViewById(R.id.drawButton).setBackgroundDrawable(getResources().getDrawable(R.drawable.drawbuttonon));
+                } else {
+                    findViewById(R.id.clearButton).setBackground(getResources().getDrawable(R.drawable.drawbuttonoff));
+                    findViewById(R.id.drawButton).setBackground(getResources().getDrawable(R.drawable.drawbuttonon));
+                }
                 clear = false;
             }
             draw = !draw;
         } else if(v == R.id.clearButton) {
+            final int sdk = android.os.Build.VERSION.SDK_INT;
             if(clear) {
-                findViewById(R.id.clearButton).setBackgroundColor(0xFFFF5733);
+                if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(R.id.clearButton).setBackgroundDrawable(getResources().getDrawable(R.drawable.drawbuttonoff));
+                } else {
+                    findViewById(R.id.clearButton).setBackground(getResources().getDrawable(R.drawable.drawbuttonoff));
+                }
             } else {
-                findViewById(R.id.clearButton).setBackgroundColor(0xFF90cc8e);
-                findViewById(R.id.drawButton).setBackgroundColor(0xFFFF5733);
+                if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(R.id.clearButton).setBackgroundDrawable(getResources().getDrawable(R.drawable.drawbuttonon));
+                    findViewById(R.id.drawButton).setBackgroundDrawable(getResources().getDrawable(R.drawable.drawbuttonoff));
+                } else {
+                    findViewById(R.id.clearButton).setBackground(getResources().getDrawable(R.drawable.drawbuttonon));
+                    findViewById(R.id.drawButton).setBackground(getResources().getDrawable(R.drawable.drawbuttonoff));
+                }
                 draw = false;
             }
             clear = !clear;
