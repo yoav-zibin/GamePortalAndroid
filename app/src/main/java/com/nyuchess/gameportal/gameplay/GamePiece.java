@@ -359,10 +359,16 @@ public class GamePiece implements IGameElement, Comparable {
                 Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                 mPaint.setStrokeWidth(drawings.get(i).getThickness());
                 mPaint.setColor(drawings.get(i).getColor());
-                canvas.drawLine(currentState.getX() - (mWidth/2) + (drawings.get(i).getFromX() * mWidth / 100),
-                        currentState.getY() - (mHeight/2) + (drawings.get(i).getFromY() * mHeight / 100),
-                        currentState.getX() - (mWidth/2) + (drawings.get(i).getToX() * mWidth / 100),
-                        currentState.getY() - (mHeight/2) + (drawings.get(i).getToY() * mHeight / 100), mPaint);
+                canvas.save();
+                canvas.translate(currentState.getX(), currentState.getY());
+                canvas.rotate(angle);
+                canvas.translate(-currentState.getX(), -currentState.getY());
+                float startX = currentState.getX() - (mWidth/2) + (drawings.get(i).getFromX() * mWidth / 100);
+                float startY = currentState.getY() - (mHeight/2) + (drawings.get(i).getFromY() * mHeight / 100);
+                float stopX = currentState.getX() - (mWidth/2) + (drawings.get(i).getToX() * mWidth / 100);
+                float stopY = currentState.getY() - (mHeight/2) + (drawings.get(i).getToY() * mHeight / 100);
+                canvas.drawLine(startX, startY, stopX, stopY, mPaint);
+                canvas.restore();
             }
         }
 

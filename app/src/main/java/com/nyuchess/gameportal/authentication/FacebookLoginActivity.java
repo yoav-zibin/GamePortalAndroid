@@ -43,7 +43,7 @@ public class FacebookLoginActivity extends AppCompatActivity {
 
         mCallbackManager = CallbackManager.Factory.create();
 
-        loginButton.setReadPermissions("email");
+        loginButton.setReadPermissions("email", "public_profile");
         loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -103,7 +103,7 @@ public class FacebookLoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
                         if (task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
+                            Log.w(TAG, "signInWithCredential");
                             Toast.makeText(FacebookLoginActivity.this, "Success",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(mAuth.getCurrentUser());
@@ -113,6 +113,14 @@ public class FacebookLoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
     }
 
     public void doLogin(View view){

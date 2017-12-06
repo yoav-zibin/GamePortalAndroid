@@ -106,6 +106,7 @@ public class FriendsActivity extends AppCompatActivity implements View.OnClickLi
         int v = view.getId();
         if(v == R.id.addFriends) {
             Intent intent = new Intent(this, UsersActivity.class);
+            intent.putExtra("FRIENDS", true);
             startActivityForResult(intent, ADD_FRIENDS);
         }
     }

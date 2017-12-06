@@ -10,7 +10,7 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:dividerHeight="16dp"
+        android:dividerHeight="2dp"
         android:divider="@android:color/transparent"
         android:id="@+id/list_of_matches"
         android:layout_above="@id/new_match"

@@ -298,8 +298,9 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             while(check < 0) {
                                 check += 360;
                             }
-
-                            Log.w(TAG, "" + check);
+                            while(check >= 360) {
+                                check -= 360;
+                            }
 
                             if (check < target.getMaxRotate()) {
                                 target.setAngle(check);
