@@ -22,7 +22,7 @@
         android:layout_alignLeft="@+id/group_button"
         android:layout_alignStart="@+id/group_button"
         android:layout_below="@+id/welcome"
-        android:background="#7aa0c2"
+        android:background="@drawable/top_left_bottom_right_round_corners"
         android:text="SIGN OUT"
         android:textSize="15sp" />
 
