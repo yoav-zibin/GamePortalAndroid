@@ -171,7 +171,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 pressedX = event.getX();
                 pressedY = event.getY();
                 //screen touched, check which piece is being touched
-                for (GamePiece piece : mGame.getPieces()) {
+                for (int p = mGame.getPieces().size()-1; p >= 0; p --) {
+                    GamePiece piece = mGame.getPieces().get(p);
                     if (x <= piece.getCurrentState().getX() + (piece.getWidth() / 2)
                             && x >= piece.getCurrentState().getX() - (piece.getWidth() / 2)
                             && y >= piece.getCurrentState().getY() - (piece.getHeight() / 2)
@@ -215,7 +216,6 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                             Log.w(TAG, "Card vis is 2");
                                             Log.w(TAG, dataSnapshot.toString());
                                             for(DataSnapshot child : dataSnapshot.getChildren()) {
-                                                Log.w(TAG, child.child("participantIndex").getValue().toString());
                                                 if(!child.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                                                     see.put(child.child("participantIndex").getValue().toString(), true);
                                                 }
@@ -365,6 +365,17 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             target.getCurrentState().setY(target.getCurrentState().getY() + dy);
                             Log.d(TAG, "ACTION_MOVE");
 
+                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
+                                mGame.getPieces().get(i).getCurrentState().setzDepth(i);
+                            }
+                            target.getCurrentState().setzDepth(mGame.getPieces().size() + 1);
+                            Collections.sort(mGame.getPieces());
+                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
+                                FirebaseDatabase.getInstance().getReference(
+                                        "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                                "/pieces/" + mGame.getPieces().get(i).getPieceIndex() + "/currentState/zDepth").setValue(mGame.getPieces().get(i).getCurrentState().getzDepth());
+                            }
+
                             /*for(int i = 0; i < target.getDrawings().size(); i++) {
                                 target.getDrawings().get(i).changeXBy(dx);
                                 target.getDrawings().get(i).changeYBy(dy);
@@ -406,7 +417,6 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                         Log.w(TAG, "Card vis is 2");
                                         Log.w(TAG, dataSnapshot.toString());
                                         for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                            Log.w(TAG, child.child("participantIndex").getValue().toString());
                                             if (!child.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                                                 see.put(child.child("participantIndex").getValue().toString(), true);
                                             }
@@ -484,16 +494,6 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                             "/pieces/" + target.getPieceIndex() + "/currentState")
                                     .updateChildren(loc);
 
-                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
-                                mGame.getPieces().get(i).getCurrentState().setZDepth(mGame.getPieces().size() - i);
-                            }
-                            target.getCurrentState().setZDepth(mGame.getPieces().size() + 1);
-                            Collections.sort(mGame.getPieces());
-                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
-                                FirebaseDatabase.getInstance().getReference(
-                                        "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
-                                                "/pieces/" + mGame.getPieces().get(i).getPieceIndex() + "/currentState/zDepth").setValue(mGame.getPieces().get(i).getCurrentState().getzDepth());
-                            }
                             target = null;
                         }
                     } else {
