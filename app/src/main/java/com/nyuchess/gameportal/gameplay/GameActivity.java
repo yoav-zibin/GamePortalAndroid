@@ -200,6 +200,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             if(target == null) {
                                 Toast.makeText(this, "No more Cards!", Toast.LENGTH_SHORT).show();
                             } else {
+                                target.getCurrentState().setzDepth(999999);
                                 DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/");
                                 Log.w(TAG, gameId + " " + GROUP_ID);
                                 pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -241,6 +242,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             Log.d("PICKED", piece.getPieceElementId());
                             target = piece;
                             rotate = target.getAngle();
+                            target.getCurrentState().setzDepth(999999);
 
                             if(target != null && draw) {
                                 historyRef.add(target);
@@ -365,17 +367,6 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             target.getCurrentState().setY(target.getCurrentState().getY() + dy);
                             Log.d(TAG, "ACTION_MOVE");
 
-                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
-                                mGame.getPieces().get(i).getCurrentState().setzDepth(i);
-                            }
-                            target.getCurrentState().setzDepth(mGame.getPieces().size() + 1);
-                            Collections.sort(mGame.getPieces());
-                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
-                                FirebaseDatabase.getInstance().getReference(
-                                        "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
-                                                "/pieces/" + mGame.getPieces().get(i).getPieceIndex() + "/currentState/zDepth").setValue(mGame.getPieces().get(i).getCurrentState().getzDepth());
-                            }
-
                             /*for(int i = 0; i < target.getDrawings().size(); i++) {
                                 target.getDrawings().get(i).changeXBy(dx);
                                 target.getDrawings().get(i).changeYBy(dy);
@@ -493,6 +484,16 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                     "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
                                             "/pieces/" + target.getPieceIndex() + "/currentState")
                                     .updateChildren(loc);
+                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
+                                mGame.getPieces().get(i).getCurrentState().setzDepth(i);
+                            }
+                            target.getCurrentState().setzDepth(mGame.getPieces().size() + 1);
+                            Collections.sort(mGame.getPieces());
+                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
+                                FirebaseDatabase.getInstance().getReference(
+                                        "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                                "/pieces/" + mGame.getPieces().get(i).getPieceIndex() + "/currentState/zDepth").setValue(mGame.getPieces().get(i).getCurrentState().getzDepth());
+                            }
 
                             target = null;
                         }
