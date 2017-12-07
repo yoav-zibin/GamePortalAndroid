@@ -198,9 +198,12 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                         if(piece.getType().equals("cardsDeck")) {
                             for(int i = 0 ; i < mGame.getPieces().size(); i ++) {
                                 GamePiece log = mGame.getPieces().get(i);
+                                Log.w(TAG, log.getOverrideInitX() + " " + log.getOverrideInitY());
+                                Log.w(TAG, log.getOverrideCurX() + " " + log.getOverrideCurY());
                                 if((int)mGame.getPieces().get(i).getDeckPieceIndex() == Integer.parseInt(piece.getPieceIndex())
-                                        && mGame.getPieces().get(i).getCurrentState().getX() == mGame.getPieces().get(i).getInitialState().getX()
-                                        && mGame.getPieces().get(i).getCurrentState().getY() == mGame.getPieces().get(i).getInitialState().getY()) {
+                                        && ((mGame.getPieces().get(i).getOverrideInitX().equals(mGame.getPieces().get(i).getOverrideCurX())
+                                        && mGame.getPieces().get(i).getOverrideInitY().equals(mGame.getPieces().get(i).getOverrideCurY())) || (mGame.getPieces().get(i).getCurrentState().getX() == mGame.getPieces().get(i).getInitialState().getX()
+                                        && mGame.getPieces().get(i).getCurrentState().getY() == mGame.getPieces().get(i).getInitialState().getY()))) {
                                     target = mGame.getPieces().get(i);
                                     rotate = target.getAngle();
                                     if(target != null && draw) {
@@ -226,6 +229,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         //target.setCanSee(true);
                                         Map<String, Object> see = new HashMap<>();
+                                        mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                                "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").setValue(see);
                                         if(cardVis == 0) {
                                             Log.w(TAG, "Card vis is 0");
                                         } else if(cardVis == 1) {
@@ -247,6 +252,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                         }
                                         mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
                                                 "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").updateChildren(see);
+                                        Log.w(TAG, "lol what");
+                                        Log.w(TAG, target.getPieceIndex() + " " + see.toString());
                                     }
 
                                     @Override
@@ -413,7 +420,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                     if(target != null) {
                         if(target.getType().equals("card")) {
                             DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/");
-                            Log.w(TAG, gameId + " " + GROUP_ID);
+                            //Log.w(TAG, gameId + " " + GROUP_ID);
                             pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {

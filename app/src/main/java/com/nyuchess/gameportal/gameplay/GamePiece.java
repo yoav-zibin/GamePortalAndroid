@@ -78,6 +78,11 @@ public class GamePiece implements IGameElement, Comparable {
 
     private boolean drawing;
 
+    private String overrideInitX;
+    private String overrideInitY;
+    private String overrideCurX;
+    private String overrideCurY;
+
     private ArrayList<FingerLine> drawings;
 
     public PieceState getInitialState() {
@@ -115,7 +120,9 @@ public class GamePiece implements IGameElement, Comparable {
         deckPieceIndex = (Long) dataSnapshot.child("deckPieceIndex").getValue();
         Log.d("WHAT", dataSnapshot.toString());
         initialState = dataSnapshot.child("initialState").getValue(PieceState.class);
-        Log.d(TAG, "initial state: " + initialState);
+        Log.w(TAG, dataSnapshot.toString());
+        overrideInitX = dataSnapshot.child("initialState").child("x").getValue().toString();
+        overrideInitY = dataSnapshot.child("initialState").child("y").getValue().toString();
         if (dataSnapshot.child("initialState").child("cardVisibility") != null) {
             final DataSnapshot children = dataSnapshot;
             DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + mGroupId + "/participants/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -152,8 +159,6 @@ public class GamePiece implements IGameElement, Comparable {
                             public void onDataChange(DataSnapshot image) {
                                 heightScreen = Integer.parseInt(image.child("height").getValue().toString());
                                 widthScreen = Integer.parseInt(image.child("width").getValue().toString());
-                                initialState.setX((int) (initialState.getX() / 100.0 * widthScreen));
-                                initialState.setY((int) (initialState.getY() / 100.0 * heightScreen));
                                 //get the actual image itself
                                 getFirebaseData();
                             }
@@ -212,6 +217,22 @@ public class GamePiece implements IGameElement, Comparable {
 
     }
 
+    public String getOverrideInitX() {
+        return overrideInitX;
+    }
+
+    public String getOverrideInitY() {
+        return overrideInitY;
+    }
+
+    public String getOverrideCurX() {
+        return overrideCurX;
+    }
+
+    public String getOverrideCurY() {
+        return overrideCurY;
+    }
+
     private class DownloadImageTask extends AsyncTask<String, Integer, Bitmap> {
 
         @Override
@@ -251,8 +272,8 @@ public class GamePiece implements IGameElement, Comparable {
         this.images = images;
         mHeight = images.get(0).getHeight();
         mWidth = images.get(0).getWidth();
-        initialState.setX((int) initialState.getX() + (mWidth/2));
-        initialState.setY((int) initialState.getY() + (mHeight/2));
+        initialState.setX((int) (initialState.getX() / 100.0 * widthScreen) + (mWidth/2));
+        initialState.setY((int) (initialState.getY() / 100.0 * heightScreen) + (mHeight/2));
         Log.d(TAG, "Height x Width: " + mHeight + " x " + mWidth);
 
         //add listener for changing state
@@ -272,7 +293,6 @@ public class GamePiece implements IGameElement, Comparable {
                                     canSee = false;
                                     for (DataSnapshot child : dataSnapshot.child("currentState").child("cardVisibility").getChildren()) {
                                         if( child.getValue() != null) {
-                                            Log.w(TAG, child.getValue().toString());
                                             if (child.getKey().equals(index) && (Boolean) child.getValue() == true) {
                                                 canSee = true;
                                             }
@@ -319,9 +339,8 @@ public class GamePiece implements IGameElement, Comparable {
                                         }
                                     }
                                 }
-                                Log.w(TAG, dataSnapshot.child("currentState").toString());
-                                Log.w(TAG, dataSnapshot.child("currentState").child("x").toString());
-                                Log.w(TAG, mGroupId + " " + mMatchId + " " + pieceIndex);
+                                overrideCurX = dataSnapshot.child("currentState").child("x").getValue().toString();
+                                overrideCurY = dataSnapshot.child("currentState").child("y").getValue().toString();
                                 int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
                                         .child("x").getValue().toString()))/ 100.0 * widthScreen) + (mWidth/2);
                                 int y = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
