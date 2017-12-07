@@ -271,6 +271,7 @@ public class GamePiece implements IGameElement, Comparable {
                                 if (dataSnapshot.child("currentState").child("cardVisibility") != null) {
                                     Log.w(TAG, dataSnapshot.child("currentState").child("cardVisibility").toString());
                                     String index = dataSnapshot2.child("participantIndex").getValue().toString();
+                                    canSee = false;
                                     for (DataSnapshot child : dataSnapshot.child("currentState").child("cardVisibility").getChildren()) {
                                         Log.w(TAG, child.toString());
                                         Log.w(TAG, "My index is " + index);
@@ -329,8 +330,12 @@ public class GamePiece implements IGameElement, Comparable {
                                         .child("y").getValue().toString())) / 100.0 * heightScreen) + (mHeight/2);
                                 int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
                                 int currentImageIndex = currentState.getCurrentImageIndex();
-                                if (type.equals("card") && canSee) {
-                                    currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
+                                if (type.equals("card")) {
+                                    if(canSee) {
+                                        currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
+                                    } else {
+                                        currentImageIndex = 1;
+                                    }
                                 } else if (!type.equals("card")) {
                                     currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
                                 }
