@@ -45,6 +45,9 @@ public class User {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() == null){
+                            return;
+                        }
                         String imageUrl = dataSnapshot.getValue().toString();
                         Log.d(TAG, imageUrl);
                         new DownloadImageTask().execute(imageUrl);
