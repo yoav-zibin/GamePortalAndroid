@@ -267,14 +267,10 @@ public class GamePiece implements IGameElement, Comparable {
                         pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot2) {
-                                Log.w(TAG, "listening for change");
                                 if (dataSnapshot.child("currentState").child("cardVisibility") != null) {
-                                    Log.w(TAG, dataSnapshot.child("currentState").child("cardVisibility").toString());
                                     String index = dataSnapshot2.child("participantIndex").getValue().toString();
                                     canSee = false;
                                     for (DataSnapshot child : dataSnapshot.child("currentState").child("cardVisibility").getChildren()) {
-                                        Log.w(TAG, child.toString());
-                                        Log.w(TAG, "My index is " + index);
                                         if( child.getValue() != null) {
                                             Log.w(TAG, child.getValue().toString());
                                             if (child.getKey().equals(index) && (Boolean) child.getValue() == true) {
@@ -323,7 +319,9 @@ public class GamePiece implements IGameElement, Comparable {
                                         }
                                     }
                                 }
-
+                                Log.w(TAG, dataSnapshot.child("currentState").toString());
+                                Log.w(TAG, dataSnapshot.child("currentState").child("x").toString());
+                                Log.w(TAG, mGroupId + " " + mMatchId + " " + pieceIndex);
                                 int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
                                         .child("x").getValue().toString()))/ 100.0 * widthScreen) + (mWidth/2);
                                 int y = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
@@ -334,7 +332,7 @@ public class GamePiece implements IGameElement, Comparable {
                                     if(canSee) {
                                         currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
                                     } else {
-                                        currentImageIndex = 1;
+                                        currentImageIndex = 0;
                                     }
                                 } else if (!type.equals("card")) {
                                     currentImageIndex = ((Long) dataSnapshot.child("currentState").child("currentImageIndex").getValue()).intValue();
