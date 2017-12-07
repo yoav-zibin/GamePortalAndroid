@@ -124,8 +124,10 @@ public class GamePiece implements IGameElement, Comparable {
                 public void onDataChange(DataSnapshot dataSnapshot2) {
                     String index = dataSnapshot2.child("participantIndex").getValue().toString();
                     for (DataSnapshot child : children.child("initialState").child("cardVisibility").getChildren()) {
-                        if (child.getKey().equals(index)) {
-                            canSee = true;
+                        if( child.getValue() != null) {
+                            if (child.getKey().equals(index) && (Boolean) child.getValue() == true) {
+                                canSee = true;
+                            }
                         }
                     }
                 }
@@ -137,7 +139,6 @@ public class GamePiece implements IGameElement, Comparable {
             });
         }
         currentState = dataSnapshot.child("initialState").getValue(PieceState.class);
-        Log.w(TAG, "" + currentState);
         previousState = dataSnapshot.child("initialState").getValue(PieceState.class);
         this.pieceIndex = dataSnapshot.getKey();
         mDatabase.getReference("gameBuilder/gameSpecs").child(mGameId).child("board")
@@ -229,11 +230,29 @@ public class GamePiece implements IGameElement, Comparable {
         }
     }
 
+    public int getmHeight() {
+        return mHeight;
+    }
+
+    public int getmWidth() {
+        return mWidth;
+    }
+
+    public int getWidthScreen() {
+        return widthScreen;
+    }
+
+    public int getHeightScreen() {
+        return heightScreen;
+    }
+
     private void finishInit(List<Bitmap> images) {
         Log.d(TAG, "initializing");
         this.images = images;
         mHeight = images.get(0).getHeight();
         mWidth = images.get(0).getWidth();
+        initialState.setX((int) initialState.getX() + (mWidth/2));
+        initialState.setY((int) initialState.getY() + (mHeight/2));
         Log.d(TAG, "Height x Width: " + mHeight + " x " + mWidth);
 
         //add listener for changing state
@@ -248,11 +267,18 @@ public class GamePiece implements IGameElement, Comparable {
                         pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot2) {
+                                Log.w(TAG, "listening for change");
                                 if (dataSnapshot.child("currentState").child("cardVisibility") != null) {
+                                    Log.w(TAG, dataSnapshot.child("currentState").child("cardVisibility").toString());
                                     String index = dataSnapshot2.child("participantIndex").getValue().toString();
                                     for (DataSnapshot child : dataSnapshot.child("currentState").child("cardVisibility").getChildren()) {
-                                        if (child.getKey().equals(index)) {
-                                            canSee = true;
+                                        Log.w(TAG, child.toString());
+                                        Log.w(TAG, "My index is " + index);
+                                        if( child.getValue() != null) {
+                                            Log.w(TAG, child.getValue().toString());
+                                            if (child.getKey().equals(index) && (Boolean) child.getValue() == true) {
+                                                canSee = true;
+                                            }
                                         }
                                     }
                                 }
@@ -269,7 +295,6 @@ public class GamePiece implements IGameElement, Comparable {
                                             for(DataSnapshot child : dataSnapshot.child("currentState").child("drawing").getChildren()) {
                                                 lastChild = child;
                                             }
-                                            Log.w(TAG, lastChild.toString());
                                             if(lastChild.child("userId").getValue().toString().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                                                 numDraw = (int) dataSnapshot.child("currentState").child("drawing").getChildrenCount();
                                             } else {
@@ -299,9 +324,9 @@ public class GamePiece implements IGameElement, Comparable {
                                 }
 
                                 int x = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
-                                        .child("x").getValue().toString())) / 100 * widthScreen) + (mWidth/2);
+                                        .child("x").getValue().toString()))/ 100.0 * widthScreen) + (mWidth/2);
                                 int y = (int) ((Float.parseFloat(dataSnapshot.child("currentState")
-                                        .child("y").getValue().toString())) / 100 * heightScreen) + (mHeight/2);
+                                        .child("y").getValue().toString())) / 100.0 * heightScreen) + (mHeight/2);
                                 int zDepth = ((Long) dataSnapshot.child("currentState").child("zDepth").getValue()).intValue();
                                 int currentImageIndex = currentState.getCurrentImageIndex();
                                 if (type.equals("card") && canSee) {
