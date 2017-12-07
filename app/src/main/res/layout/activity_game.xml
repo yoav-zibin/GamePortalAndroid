@@ -101,4 +101,26 @@
         android:paddingRight="20dp"
         android:text="Clear all drawings" />
 
+    <Button
+        android:id="@+id/pullOutVisiblity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/undoButton"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/sendbutton"
+        android:layout_marginRight="10dp"
+        android:text="Card Ops" />
+
+    <Button
+        android:id="@+id/setCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/hexColor"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignStart="@+id/textView4"
+        android:background="@drawable/genericbuttonoff"
+        android:text="Set Card" />
+
 </RelativeLayout>

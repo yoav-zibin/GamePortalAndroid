@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -73,9 +75,11 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
     private int onScreen = 0;
     private int rotate;
+    private int cardVis = 1;
 
     private boolean draw;
     private boolean clear;
+    private boolean setCard = false;
 
     //the piece currently being acted on with a touch event, if any
     private GamePiece target;
@@ -87,6 +91,40 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Log.d(TAG, "onCreate");
+        final SlidingMenu menu = new SlidingMenu(this);
+        menu.setMode(SlidingMenu.RIGHT);
+        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        //menu.setBehindOffsetRes(R.dimen.);
+        menu.setFadeDegree(0.5f);
+        menu.attachToActivity(GameActivity.this, SlidingMenu.SLIDING_CONTENT);
+        menu.setMenu(R.layout.activity_menu);
+
+        Button mButton = (Button) findViewById(R.id.pullOutVisiblity);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                //menu.showMenu();
+                //or
+                menu.toggle();
+            }
+        });
+
+        Button mButton2 = (Button) findViewById(R.id.backButton);
+        mButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                //menu.showMenu();
+                //or
+                menu.toggle();
+            }
+        });
+
+        findViewById(R.id.visNone).setOnClickListener(this);
+        findViewById(R.id.visAllBut).setOnClickListener(this);
+        findViewById(R.id.visEvery).setOnClickListener(this);
+        findViewById(R.id.visMe).setOnClickListener(this);
+        findViewById(R.id.setAll).setOnClickListener(this);
+        findViewById(R.id.setCard).setOnClickListener(this);
 
         // Get the images and other information from Firebase
         gameId = getIntent().getStringExtra(KEY_ID);
@@ -476,6 +514,80 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 history.remove(history.size() - 1);
                 historyRef.remove(historyRef.size() - 1);
             }
+        } else if(v == R.id.visAllBut) {
+            cardVis = 2;
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                findViewById(v).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visMe).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visEvery).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visNone).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+            } else {
+                findViewById(v).setBackground(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visMe).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visEvery).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visNone).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+            }
+        } else if(v == R.id.visEvery) {
+            cardVis = 3;
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                findViewById(v).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visMe).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visAllBut).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visNone).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+            } else {
+                findViewById(v).setBackground(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visMe).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visAllBut).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visNone).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+            }
+        } else if(v == R.id.visMe) {
+                cardVis = 1;
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                findViewById(v).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visEvery).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visAllBut).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visNone).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+            } else {
+                findViewById(v).setBackground(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visAllBut).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visEvery).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visNone).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+            }
+        } else if(v == R.id.visNone) {
+            cardVis = 0;
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                findViewById(v).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visMe).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visEvery).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visAllBut).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+            } else {
+                findViewById(v).setBackground(getResources().getDrawable(R.drawable.genericbuttonon));
+                findViewById(R.id.visMe).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visEvery).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                findViewById(R.id.visAllBut).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+            }
+        } else if(v == R.id.setAll) {
+
+        } else if(v == R.id.setCard) {
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if(setCard) {
+                if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(v).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonoff));
+                } else {
+                    findViewById(v).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
+                }
+            } else {
+                if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(v).setBackgroundDrawable(getResources().getDrawable(R.drawable.genericbuttonon));
+                } else {
+                    findViewById(v).setBackground(getResources().getDrawable(R.drawable.genericbuttonon));
+                }
+            }
+            setCard = !setCard;
         }
     }
 }

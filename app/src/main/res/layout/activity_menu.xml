@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/sendbutton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:textSize="15sp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Back" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp"
+        android:textSize="15sp"
+        android:text="Drawn cards are visible to..." />
+
+    <Button
+        android:id="@+id/visNone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView5"
+        android:layout_centerHorizontal="true"
+        android:width="120dp"
+        android:height="60dp"
+        android:background="@drawable/genericbuttonoff"
+        android:layout_marginTop="10dp"
+        android:text="No One" />
+
+    <Button
+        android:id="@+id/visMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/visNone"
+        android:layout_centerHorizontal="true"
+        android:width="120dp"
+        android:height="60dp"
+        android:background="@drawable/genericbuttonon"
+        android:layout_marginTop="10dp"
+        android:text="Just Me" />
+
+    <Button
+        android:id="@+id/visAllBut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/visMe"
+        android:layout_centerHorizontal="true"
+        android:width="120dp"
+        android:height="60dp"
+        android:background="@drawable/genericbuttonoff"
+        android:layout_marginTop="10dp"
+        android:text="All But Me" />
+
+    <Button
+        android:id="@+id/visEvery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/visAllBut"
+        android:layout_centerHorizontal="true"
+        android:width="120dp"
+        android:height="60dp"
+        android:background="@drawable/genericbuttonoff"
+        android:layout_marginTop="10dp"
+        android:text="Everyone!" />
+
+    <Button
+        android:id="@+id/setAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/visEvery"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/undobutton"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:text="Set All Current Cards To This" />
+</RelativeLayout>
