@@ -522,9 +522,9 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                             "/pieces/" + target.getPieceIndex() + "/currentState")
                                     .updateChildren(loc);
                             for(int i = 0; i < mGame.getPieces().size(); i ++) {
-                                mGame.getPieces().get(i).getCurrentState().setzDepth(i);
+                                mGame.getPieces().get(i).getCurrentState().setzDepth((i+1));
                             }
-                            target.getCurrentState().setzDepth(mGame.getPieces().size() + 1);
+                            target.getCurrentState().setzDepth(mGame.getPieces().size() + 2);
                             Collections.sort(mGame.getPieces());
                             for(int i = 0; i < mGame.getPieces().size(); i ++) {
                                 FirebaseDatabase.getInstance().getReference(
