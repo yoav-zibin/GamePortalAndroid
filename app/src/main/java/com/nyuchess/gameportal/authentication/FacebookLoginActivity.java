@@ -108,6 +108,7 @@ public class FacebookLoginActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                             updateUI(mAuth.getCurrentUser());
                         }else{
+                            Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(FacebookLoginActivity.this, "Authentication error",
                                     Toast.LENGTH_SHORT).show();
                         }
