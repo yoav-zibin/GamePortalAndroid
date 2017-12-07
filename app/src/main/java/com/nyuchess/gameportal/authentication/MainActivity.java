@@ -12,6 +12,9 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nyuchess.gameportal.util.FontManager;
 import com.nyuchess.gameportal.R;
 
@@ -32,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
         FontManager.markAsIconContainer(findViewById(R.id.facebook_sign_in_button), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.twitter_sign_in_button), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.gplus_sign_in_button), iconFont);
+
+        //set image loader to cache images by default
+        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true).cacheOnDisk(true).build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+                .defaultDisplayImageOptions(defaultOptions)
+                .build();
+        ImageLoader.getInstance().init(config);
 
     }
 

@@ -1,9 +1,8 @@
 package com.nyuchess.gameportal.gameplay;
 
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,20 +18,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.nyuchess.gameportal.R;
+import com.nyuchess.gameportal.groups.User;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nyuchess.gameportal.R;
-import com.nyuchess.gameportal.groups.User;
 
 public class GameActivity extends AppCompatActivity implements View.OnTouchListener, View.OnClickListener {
 
@@ -160,14 +154,6 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 setFontSize(seekBar.getProgress());
             }
         });
-
-        //set image loader to cache images by default
-        DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true).cacheOnDisk(true).build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
-           .defaultDisplayImageOptions(defaultOptions)
-           .build();
-        ImageLoader.getInstance().init(config);
     }
 
     public void setFontSize(int x) {
