@@ -1,7 +1,11 @@
 package com.nyuchess.gameportal.gameplay;
 
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Canvas;
+import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -80,10 +84,23 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
     private final FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
 
+    private MediaPlayer diceRoll = null;
+    private MediaPlayer cardDraw = null;
+    private MediaPlayer cardPlace = null;
+    private MediaPlayer pickPiece = null;
+    private MediaPlayer setPiece = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        diceRoll = MediaPlayer.create(this, R.raw.diceroll);
+        cardDraw = MediaPlayer.create(this, R.raw.cardslide);
+        cardPlace = MediaPlayer.create(this, R.raw.cardplace);
+        pickPiece = MediaPlayer.create(this, R.raw.pickpiece);
+        setPiece = MediaPlayer.create(this, R.raw.setpiece);
+
         Log.d(TAG, "onCreate");
         final SlidingMenu menu = new SlidingMenu(this);
         menu.setMode(SlidingMenu.RIGHT);
@@ -200,6 +217,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             if(target == null) {
                                 Toast.makeText(this, "No more Cards!", Toast.LENGTH_SHORT).show();
                             } else {
+                                cardDraw.start();
                                 target.getCurrentState().setzDepth(999999);
                                 DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/");
                                 Log.w(TAG, gameId + " " + GROUP_ID);
@@ -238,11 +256,15 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                 });
                             }
                         } else {
-
                             Log.d("PICKED", piece.getPieceElementId());
                             target = piece;
                             rotate = target.getAngle();
                             target.getCurrentState().setzDepth(999999);
+                            if(target.getType().equals("card")) {
+                                cardDraw.start();
+                            } else {
+                                pickPiece.start();
+                            }
 
                             if(target != null && draw) {
                                 historyRef.add(target);
@@ -453,6 +475,9 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                         } else {
                             Log.d(TAG, "ACTION_UP_CLICK");
                             int newImageIndex = target.getNextImageIndex();
+                            if(target.getType().equals("dice")) {
+                                diceRoll.start();
+                            }
                             Map<String, Object> newState = new HashMap<>();
                             newState.put("currentImageIndex", newImageIndex);
                             Log.d(TAG, "Updating image index to " + newImageIndex);
@@ -471,6 +496,11 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             history.add(lastLines);
                             target = null;
                         } else {
+                            if(target.getType().equals("card")) {
+                                cardPlace.start();
+                            } else {
+                                setPiece.start();
+                            }
                             Log.d(TAG, "ACTION_UP_DRAG");
                             Map<String, Object> loc = new HashMap<>();
                             double nX = x - (target.getWidth()/2);
