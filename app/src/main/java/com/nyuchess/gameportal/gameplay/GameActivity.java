@@ -87,7 +87,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         Log.d(TAG, "onCreate");
         final SlidingMenu menu = new SlidingMenu(this);
         menu.setMode(SlidingMenu.RIGHT);
-        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         //menu.setBehindOffsetRes(R.dimen.);
         menu.setFadeDegree(0.5f);
         menu.attachToActivity(GameActivity.this, SlidingMenu.SLIDING_CONTENT);
@@ -199,15 +199,33 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                             if(target == null) {
                                 Toast.makeText(this, "No more Cards!", Toast.LENGTH_SHORT).show();
                             } else {
-                                DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/");
+                                Log.w(TAG, gameId + " " + GROUP_ID);
                                 pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        target.setCanSee(true);
+                                        //target.setCanSee(true);
                                         Map<String, Object> see = new HashMap<>();
-                                        see.put(dataSnapshot.child("participantIndex").getValue().toString(), true);
-                                        Log.w("LMAO", "" + see);
-                                        Log.w("LMAO", dataSnapshot.toString());
+                                        if(cardVis == 0) {
+                                            Log.w(TAG, "Card vis is 0");
+                                        } else if(cardVis == 1) {
+                                            Log.w(TAG, "Card vis is 1");
+                                            see.put(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("participantIndex").getValue().toString(), true);
+                                        } else if(cardVis == 2) {
+                                            Log.w(TAG, "Card vis is 2");
+                                            Log.w(TAG, dataSnapshot.toString());
+                                            for(DataSnapshot child : dataSnapshot.getChildren()) {
+                                                Log.w(TAG, child.child("participantIndex").getValue().toString());
+                                                if(!child.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                                    see.put(child.child("participantIndex").getValue().toString(), true);
+                                                }
+                                            }
+                                        } else if(cardVis == 3) {
+                                            Log.w(TAG, "Card vis is 3");
+                                            for(DataSnapshot child : dataSnapshot.getChildren()) {
+                                                see.put(child.child("participantIndex").getValue().toString(), true);
+                                            }
+                                        }
                                         mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
                                                 "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").updateChildren(see);
                                     }
@@ -244,6 +262,9 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 } else
                 //if a piece is being dragged, move it
                 if (target != null) {
+                    if(setCard) {
+
+                    } else
                     if(draw) {
                         if(x <= target.getCurrentState().getX() + (target.getWidth() / 2)
                                 && x >= target.getCurrentState().getX() - (target.getWidth() / 2)
@@ -364,6 +385,51 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 view.performClick();
                 long pressDuration = System.currentTimeMillis() - pressStartTime;
                 // Click event
+                if(setCard) {
+                    if(target != null) {
+                        if(target.getType().equals("card")) {
+                            DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/");
+                            Log.w(TAG, gameId + " " + GROUP_ID);
+                            pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    //target.setCanSee(true);
+                                    Map<String, Object> see = new HashMap<>();
+                                    mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                            "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").setValue(see);
+                                    if (cardVis == 0) {
+                                        Log.w(TAG, "Card vis is 0");
+                                    } else if (cardVis == 1) {
+                                        Log.w(TAG, "Card vis is 1");
+                                        see.put(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("participantIndex").getValue().toString(), true);
+                                    } else if (cardVis == 2) {
+                                        Log.w(TAG, "Card vis is 2");
+                                        Log.w(TAG, dataSnapshot.toString());
+                                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                            Log.w(TAG, child.child("participantIndex").getValue().toString());
+                                            if (!child.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                                see.put(child.child("participantIndex").getValue().toString(), true);
+                                            }
+                                        }
+                                    } else if (cardVis == 3) {
+                                        Log.w(TAG, "Card vis is 3");
+                                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                            see.put(child.child("participantIndex").getValue().toString(), true);
+                                        }
+                                    }
+                                    mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                            "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").updateChildren(see);
+                                    Toast.makeText(getBaseContext(), "Changed card status!", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+                } else
                 if(clear) {
                     if(target != null) {
                         DatabaseReference ref = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
@@ -557,7 +623,50 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 findViewById(R.id.visAllBut).setBackground(getResources().getDrawable(R.drawable.genericbuttonoff));
             }
         } else if(v == R.id.setAll) {
+            for(int i = 0; i < mGame.getPieces().size(); i++) {
+                final GamePiece target = mGame.getPieces().get(i);
+                if(target.getType().equals("card")) {
+                    DatabaseReference pIndex = mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/participants/");
+                    Log.w(TAG, gameId + " " + GROUP_ID);
+                    pIndex.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            //target.setCanSee(true);
+                            Map<String, Object> see = new HashMap<>();
+                            mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                    "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").setValue(see);
+                            if (cardVis == 0) {
+                                Log.w(TAG, "Card vis is 0");
+                            } else if (cardVis == 1) {
+                                Log.w(TAG, "Card vis is 1");
+                                see.put(dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("participantIndex").getValue().toString(), true);
+                            } else if (cardVis == 2) {
+                                Log.w(TAG, "Card vis is 2");
+                                Log.w(TAG, dataSnapshot.toString());
+                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                    Log.w(TAG, child.child("participantIndex").getValue().toString());
+                                    if (!child.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                        see.put(child.child("participantIndex").getValue().toString(), true);
+                                    }
+                                }
+                            } else if (cardVis == 3) {
+                                Log.w(TAG, "Card vis is 3");
+                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                    see.put(child.child("participantIndex").getValue().toString(), true);
+                                }
+                            }
+                            mDatabase.getReference("gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                    "/pieces/" + target.getPieceIndex() + "/currentState/cardVisibility").updateChildren(see);
+                        }
 
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+            Toast.makeText(getBaseContext(), "YOU'VE CHANGED ALL CARDS", Toast.LENGTH_SHORT).show();
         } else if(v == R.id.setCard) {
             final int sdk = android.os.Build.VERSION.SDK_INT;
             if(setCard) {
