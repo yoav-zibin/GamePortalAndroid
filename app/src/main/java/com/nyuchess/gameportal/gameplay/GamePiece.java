@@ -556,6 +556,10 @@ public class GamePiece implements IGameElement, Comparable {
             this.zDepth = zDepth;
             this.currentImageIndex = currentImageIndex;
         }
+
+        public void setZDepth(int depth) {
+            zDepth = depth;
+        }
     }
 
 }

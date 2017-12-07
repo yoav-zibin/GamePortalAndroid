@@ -483,7 +483,17 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                                     "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
                                             "/pieces/" + target.getPieceIndex() + "/currentState")
                                     .updateChildren(loc);
-                            Log.d("YO1", target.getPieceElementId() + " x " + target.getCurrentState().getX());
+
+                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
+                                mGame.getPieces().get(i).getCurrentState().setZDepth(mGame.getPieces().size() - i);
+                            }
+                            target.getCurrentState().setZDepth(mGame.getPieces().size() + 1);
+                            Collections.sort(mGame.getPieces());
+                            for(int i = 0; i < mGame.getPieces().size(); i ++) {
+                                FirebaseDatabase.getInstance().getReference(
+                                        "gamePortal/groups/" + GROUP_ID + "/matches/" + MATCH_ID +
+                                                "/pieces/" + mGame.getPieces().get(i).getPieceIndex() + "/currentState/zDepth").setValue(mGame.getPieces().get(i).getCurrentState().getzDepth());
+                            }
                             target = null;
                         }
                     } else {
